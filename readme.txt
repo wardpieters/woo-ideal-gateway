@@ -49,7 +49,7 @@ After that you click on 'Select types to send' and mark 'source.chargeable' (to 
 If you need help setting this up, please look in the Support section of the FAQ.
 
 == Frequently Asked Questions ==
- 
+
 = Support =
 If you have any problem with this plugin don't hesitate to contact me at [support@wardpieters.nl](mailto:support@wardpieters.nl). I will reply as soon as possible.
 

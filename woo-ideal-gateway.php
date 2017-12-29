@@ -76,13 +76,13 @@ function IncludeClasses() {
 	include(__DIR__ . '/includes/woo-ideal-gateway-class-fee.php');
 	include(__DIR__ . '/includes/woo-ideal-gateway-class-notification.php');
 	include(__DIR__ . '/includes/woo-ideal-gateway-class-stripe-webhook.php');
-	
+
 	$Notification = new Notification(true);
 	$Notification->woo_ideal_gateway_check_api();
-	
+
 	$Fee = new Fee;
 	$Fee->woo_ideal_gateway_fee_init();
-	
+
 	$StripeWebhook = new StripeWebhook;
 	$StripeWebhook->ReceiveWebhook();
 }
@@ -94,9 +94,9 @@ add_action('plugins_loaded', 'woo_ideal_gateway_init', 11);
 function woo_ideal_gateway_init() {
 
 	class WC_iDEAL_Gateway extends WC_Payment_Gateway {
-		
+
 		/**
-		 * @since 0.5 
+		 * @since 0.5
 		 * Constructor for the gateway.
 		 */
 		public function __construct($add_actions = false) {
@@ -106,12 +106,12 @@ function woo_ideal_gateway_init() {
 			$this->method_title		  = __('iDEAL', 'woo-ideal-gateway');
 			//$this->method_description = __('Adds iDEAL as payment gateway, a <a href="https://stripe.com/">Stripe API key</a> is required.', 'woo-ideal-gateway' );
 			$this->method_description = __('WooCommerce iDEAL Gateway will generate a iDEAL source at Stripe using their API, then send the customer to their bank of choice. At this point the order is put on-hold, once the order is payed, Stripe will use a webhook to let WooCommerce know the payment succeeded. To use this payment gateway you are required to have a <a href="https://stripe.com/">Stripe API key</a>, you can read more about Stripe\'s Authentication <a href="https://stripe.com/docs/api#authentication">here</a>.', 'woo-ideal-gateway' );
-			
+
 			$this->supports = array(
 				'products',
 				'refunds'
 			);
-			
+
 			// Load the settings.
 			$this->init_form_fields();
 			$this->init_settings();
@@ -122,10 +122,10 @@ function woo_ideal_gateway_init() {
 			$this->stripe_api_test = $this->get_option('woocommerce-stripe-api-test');
 			$this->show_error_codes_to_customer = $this->get_option('show-error-codes-to-customer');
 			$this->title = $this->get_option('title');
-			
+
 			// Stripe API URL
 			$this->api_url = "https://api.stripe.com/v1/";
-			
+
 			// API Key variable used in other classes to get current API Key
 			if($this->get_option('test-mode') == 'yes') {
 				$this->api_key = $this->get_option('stripe-api-test');
@@ -135,7 +135,7 @@ function woo_ideal_gateway_init() {
 				$this->api_key = $this->get_option('stripe-api-live');
 				$this->api_key_type = __('live', 'woo-ideal-gateway');
 			}
-			
+
 			// Actions
 			if ($add_actions == true) {
 				add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
@@ -143,19 +143,19 @@ function woo_ideal_gateway_init() {
 			}
 			//add_filter('woocommerce_email_classes', array( $this, 'manipulate_woocommerce_email_sending'));
 		}
-		
+
 		function manipulate_woocommerce_email_sending($email_class) {
 			//remove_action( 'woocommerce_order_status_pending_to_on-hold_notification', array( $email_class['WC_Email_New_Order'], 'trigger' ) );
 		}
-		
-		
-		
+
+
+
 		/**
 		* Creates a random key used for securing the webhook
 		*
 		* @since 2.0
 		*/
-		
+
 		private function random_webhook_key($lengte, $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ') {
 			$str = '';
 			$max = mb_strlen($keyspace, '8bit') - 1;
@@ -189,7 +189,7 @@ function woo_ideal_gateway_init() {
 					'default'     => __('iDEAL', 'woo-ideal-gateway'),
 					'desc_tip'    => false,
 				),
-				
+
 				'test-mode' => array(
 					'title'   => __('Enable/Disable Test Mode', 'woo-ideal-gateway'),
 					'type'    => 'checkbox',
@@ -204,7 +204,7 @@ function woo_ideal_gateway_init() {
 					'default'     => __('sk_live_XXXXXXXXXXXXXXXXXXXXXXXX', 'woo-ideal-gateway'),
 					'desc_tip'    => true,
 				),
-				
+
 				'stripe-api-test' => array(
 					'title'       => __('Stripe Secret API Key (Test)', 'woo-ideal-gateway'),
 					'type'        => 'text',
@@ -212,11 +212,11 @@ function woo_ideal_gateway_init() {
 					'default'     => __('sk_test_XXXXXXXXXXXXXXXXXXXXXXXX', 'woo-ideal-gateway'),
 					'desc_tip'    => true,
 				),
-				
+
 				'stripe-webhook-key' => array(
 					'title'       => __('Stripe Webhook Key', 'woo-ideal-gateway'),
 					'type'        => 'text',
-					'description' => __('Your webhook URL:', 'woo-ideal-gateway') . ' <strong><a>' . esc_url(home_url('/?stripe_webhook=yes&key=')) . $webhook_key . '</a></strong>' . 
+					'description' => __('Your webhook URL:', 'woo-ideal-gateway') . ' <strong><a>' . esc_url(home_url('/?stripe_webhook=yes&key=')) . $webhook_key . '</a></strong>' .
 										'<br>' . __('Read <a href="https://nl.wordpress.org/plugins/woo-ideal-gateway/#installation">here</a> how to setup this webhook', 'woo-ideal-gateway'),
 					'default'     => $this->random_webhook_key(30),
 					'desc_tip'    => false,
@@ -229,7 +229,7 @@ function woo_ideal_gateway_init() {
 					'default'     => __('Payment for #{order_number}', 'woo-ideal-gateway'),
 					'desc_tip'    => false,
 				),
-				
+
 				'stripe-cost-to-customer' => array(
 					'title'   => __('Transactionfee', 'woo-ideal-gateway'),
 					'type'    => 'checkbox',
@@ -246,7 +246,7 @@ function woo_ideal_gateway_init() {
 
 			) );
 		}
-		
+
 		/**
 		* Includes the StripeAPI Class
 		*
@@ -255,7 +255,7 @@ function woo_ideal_gateway_init() {
 		public function InitStripeAPI() {
 			require_once(__DIR__ . '/includes/woo-ideal-gateway-class-stripe.php');
 		}
-		
+
 		/**
 		* Checks if a Stripe Webhook Key has been filled in or else returns "PLEASE_CREATE_A_KEY"
 		*
@@ -271,7 +271,7 @@ function woo_ideal_gateway_init() {
 				return $webhook_key;
 			}
 		}
-		
+
 		/**
 		* When redirect to the webshop check source if payment is failed, if so update order status.
 		*
@@ -281,21 +281,21 @@ function woo_ideal_gateway_init() {
 
 			$this->InitStripeAPI();
 			$StripeAPI = new StripeAPI;
-			
+
 			if($this->show_error_codes_to_customer == 'yes') $show_error = true;
 			else $show_error = false;
-			
+
 			global $woocommerce;
 			$order = new WC_Order($order_id);
-			
+
 			$order_data = $order->get_data();
 			$order_status = $order_data['status'];
-			
+
 			if($order_status != "on-hold") return false;
-			
+
 			$source = get_post_meta($order_id, 'woo-ideal-gateway-stripe-source', true);
 			$status = $StripeAPI->GetSourceStatus($source);
-			
+
 			if($status !== false) {
 				if($status == 'failed') {
 					$order->update_status('failed', __('iDEAL Payment canceled by customer', 'woo-ideal-gateway'));
@@ -303,10 +303,10 @@ function woo_ideal_gateway_init() {
 					return;
 				}
 			}
-			
-			
+
+
 		}
-		
+
 		/**
 		* Adds the bank selector at the checkout screen
 		*
@@ -330,7 +330,7 @@ function woo_ideal_gateway_init() {
 			<br>
 			<select id="iDEAL_BANK" name="iDEAL_BANK">
 			<option disabled="disabled" selected>' . __("Choose your bank", 'woo-ideal-gateway') . '</option>';
-			
+
 			foreach( $stripe_banks as $code => $name ) {
 				echo '<option value="' . $code . '">' . $name . '</option>';
 			}
@@ -345,39 +345,39 @@ function woo_ideal_gateway_init() {
 		public function process_payment($order_id) {
 			$this->InitStripeAPI();
 			$StripeAPI = new StripeAPI;
-			
+
 			global $woocommerce;
 			$order = new WC_Order($order_id);
 			$order_data = $order->get_data();
 			$payment_gateway = $order_data['payment_method'];
-			
+
 			if($order_data['payment_method'] == "ideal_gateway") {
-				
-				
+
+
 				/**
 				* @since 2.2
 				* Checks if user entered a bank, if user entered a bank, check if it's correct and exists in $stripe_bank
 				* Otherwise return error on checkout page
 				*/
-				
+
 				$stripe_bank = array('abn_amro', 'asn_bank', 'bunq', 'ing', 'knab', 'rabobank', 'regiobank', 'sns_bank', 'triodos_bank', 'van_lanschot');
-				
+
 				if(!isset($_POST['iDEAL_BANK']) OR !in_array($_POST['iDEAL_BANK'],$stripe_bank)) {
 					wc_add_notice(__("Please choose your bank and try again", 'woo-ideal-gateway'), 'error');
 					return;
 				}
-				
+
 				/**
 				* @since 2.3
 				* If enabled, user will see the error code on the checkout page,
 				* this might be useful if you want to fix this issue.
 				*/
-				
+
 				if($this->show_error_codes_to_customer == 'yes') $show_error = true;
 				else $show_error = false;
-				
+
 				$stripe_response = $StripeAPI->CreateSource($order_data, $order_id);
-				
+
 				if($stripe_response['success'] == 'no') {
 					$order->add_order_note(__('Stripe error', 'woo-ideal-gateway') . ': ' . $stripe_response['error_message'] . ' (' . $stripe_response['error_type'] . ')'); //FAILURE NOTE
 					if($show_error) wc_add_notice(__('iDEAL payment failed, please try again', 'woo-ideal-gateway') . ' (' . __('Error', 'woo-ideal-gateway') . ': ' . $stripe_response['error_type'] . ')', 'error');
@@ -388,23 +388,23 @@ function woo_ideal_gateway_init() {
 					$stripe_source_id = $stripe_response['source_id'];
 					$stripe_url = $stripe_response['redirect_url'];
 					update_post_meta($order_id, 'woo-ideal-gateway-stripe-source', $stripe_source_id);
-					
+
 					$order->update_status('on-hold', __('New iDEAL payment initiated by customer', 'woo-ideal-gateway'));
-					
+
 					// Empty cart
 					WC()->cart->empty_cart();
-					
+
 					return array(
 						'result' => 'success',
 						'redirect' => $stripe_url
 					);
-					
+
 				}
-			
+
 			}
-			
+
 		}
-		
+
 		/**
 		* Refunds the payment via Stripe
 		*
@@ -428,13 +428,13 @@ function woo_ideal_gateway_init() {
 					// Refund failed, user gets notified.
 					$error_type = $stripe_response['error_type'];
 					$error_message = $stripe_response['error_message'];
-					
+
 					return new WP_Error($error_type, __('Stripe error', 'woo-ideal-gateway') . ': ' . $error_message);
 				}
 			}
-			
+
 		}
-		
+
 	}
-  
+
 }
