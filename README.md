@@ -20,8 +20,8 @@ Payment gateway for WooCommerce that allows iDEAL via Stripe. This does not requ
 
 ### More information
 
-If you are looking for more information about this plugin, please visit the (plugin page)[https://wordpress.org/plugins/woo-ideal-gateway/] on WordPress.org.
+If you are looking for more information about this plugin, please visit the [plugin page](https://wordpress.org/plugins/woo-ideal-gateway) on WordPress.org.
 
 ### Support
 
-If you need any help, open a support thread (over here)[https://wordpress.org/support/plugin/woo-ideal-gateway] or email me at (support@wardpieters.nl)[mailto:support@wardpieters.nl].
+If you need any help, open a support thread [over here](https://wordpress.org/support/plugin/woo-ideal-gateway) or email me at [support@wardpieters.nl](mailto:support@wardpieters.nl).
