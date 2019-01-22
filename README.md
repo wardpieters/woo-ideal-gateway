@@ -1,6 +1,6 @@
 # WooCommerce iDEAL Gateway
 
-Payment gateway for WooCommerce that allows iDEAL via Stripe. This does not require a Chamber of commerce number!
+Payment gateway for WooCommerce that allows iDEAL via Stripe.
 
 [![WP compatibility](https://plugintests.com/plugins/woo-ideal-gateway/wp-badge.svg)](https://plugintests.com/plugins/woo-ideal-gateway/latest) [![PHP compatibility](https://plugintests.com/plugins/woo-ideal-gateway/php-badge.svg)](https://plugintests.com/plugins/woo-ideal-gateway/latest)
 
