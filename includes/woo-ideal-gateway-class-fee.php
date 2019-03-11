@@ -24,8 +24,11 @@ class Fee extends WC_iDEAL_Gateway {
 		global $woocommerce;
 		if((is_admin() && !defined('DOING_AJAX')) || !is_checkout()) return;
 		
+		$cost_amount = $this->get_option('stripe-cost-amount');
+		if(count(explode(wc_get_price_decimal_separator(), $cost_amount)) < 1) return;
+		
 		if(WC()->session->chosen_payment_method == "ideal_gateway" && $this->get_option('stripe-cost-to-customer') == 'yes') {
-			$woocommerce->cart->add_fee(__('iDEAL Cost', 'woo-ideal-gateway'), 0.45, true, 'standard');
+			$woocommerce->cart->add_fee(__('Transaction fee', 'woo-ideal-gateway'), $cost_amount, true, 'standard');
 		}
 	}
 	
@@ -40,20 +43,12 @@ class Fee extends WC_iDEAL_Gateway {
 		if (is_checkout()) :
 		?>
 			<script>
-				jQuery( function( $ ) {
-					
-					// woocommerce_params is required to continue, ensure the object exists
-					if ( typeof woocommerce_params === 'undefined' ) {
-						return false;
-					}
-					
-					$checkout_form = $( 'form.checkout' );
-					
-					$checkout_form.on( 'change', 'input[name="payment_method"]', function() {
-							$checkout_form.trigger( 'update' );
+				jQuery(function($) {
+					if (typeof woocommerce_params === 'undefined') return false;
+					$checkout_form = $('form.checkout');
+					$checkout_form.on('change', 'input[name="payment_method"]', function() {
+						$checkout_form.trigger('update');
 					});
-					
-					
 				});
 			</script>
 		<?php

@@ -10,6 +10,8 @@
  *
  * Copyright: (c) 2018 Ward Pieters
  *
+ * WC tested up to: 3.5.6
+ *
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -60,7 +62,7 @@ add_filter('woocommerce_payment_gateways', 'wc_ideal_add_to_gateways');
 function woo_ideal_gateway_plugin_links($links) {
 	$plugin_links = array(
 		'<a href="' . admin_url( 'admin.php?page=wc-settings&tab=checkout&section=ideal_gateway' ) . '">' . __( 'Settings', 'woo-ideal-gateway' ) . '</a>',
-		'<a href="mailto:support@wardpieters.nl">' . __( 'Support', 'woo-ideal-gateway' ) . '</a>'
+		'<a href="https://wordpress.org/support/plugin/woo-ideal-gateway/">' . __( 'Support', 'woo-ideal-gateway' ) . '</a>'
 	);
 	return array_merge( $plugin_links, $links );
 }
@@ -87,7 +89,7 @@ function IncludeClasses() {
 	$StripeWebhook->ReceiveWebhook();
 }
 
-add_action('init', 'IncludeClasses');
+add_action('init', 'IncludeClasses', 11);
 add_action('plugins_loaded', 'woo_ideal_gateway_init', 11);
 
 
@@ -107,10 +109,7 @@ function woo_ideal_gateway_init() {
 			//$this->method_description = __('Adds iDEAL as payment gateway, a <a href="https://stripe.com/">Stripe API key</a> is required.', 'woo-ideal-gateway' );
 			$this->method_description = __('WooCommerce iDEAL Gateway will generate a iDEAL source at Stripe using their API, then send the customer to their bank of choice. At this point the order is put on-hold, once the order is payed, Stripe will use a webhook to let WooCommerce know the payment succeeded. To use this payment gateway you are required to have a <a href="https://stripe.com/">Stripe API key</a>, you can read more about Stripe\'s Authentication <a href="https://stripe.com/docs/api#authentication">here</a>.', 'woo-ideal-gateway' );
 			
-			$this->supports = array(
-				'products',
-				'refunds'
-			);
+			$this->supports = array('products', 'refunds');
 			
 			// Load the settings.
 			$this->init_form_fields();
@@ -164,7 +163,6 @@ function woo_ideal_gateway_init() {
 				$str .= $keyspace[random_int(0, $max)];
 			}
 			return $str;
-			// Thanks to https://github.com/rinkp
 		}
 
 		/**
@@ -239,10 +237,17 @@ function woo_ideal_gateway_init() {
 				),
 				
 				'stripe-cost-to-customer' => array(
-					'title'   => __('Transactionfee', 'woo-ideal-gateway'),
+					'title'   => __('Transaction fee', 'woo-ideal-gateway'),
 					'type'    => 'checkbox',
-					'label'   => __('Let the customer pay the transactionfee (€ 0,45)', 'woo-ideal-gateway'),
+					'label'   => __('Let the customer pay the transaction fee specified below', 'woo-ideal-gateway'),
 					'default' => 'no'
+				),
+				
+				'stripe-cost-amount' => array(
+					'title'   => __('Transaction fee', 'woo-ideal-gateway'),
+					'description' => __('The amount of the transaction fee. <strong>Decimal seperator: ', 'woo-ideal-gateway' ) . wc_get_price_decimal_separator() . "</strong>",
+					'type'    => 'text',
+					'default' => '0' . wc_get_price_decimal_separator() . '29'
 				),
 
 				'show-error-codes-to-customer' => array(

@@ -3,8 +3,8 @@ Contributors: WardPieters, WooCommerce
 Tags: ideal, woocommerce, stripe, ideal betalen, payment gateway, ideal gateway, ecommerce, shopping, webshop
 Donate link: https://www.paypal.me/wardpieters
 Requires at least: 4.7
-Tested up to: 4.9.8
-Stable tag: 2.5
+Tested up to: 5.1
+Stable tag: 2.6
 Requires PHP: 5.5
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -76,6 +76,10 @@ If you want to disable this, you can simply disable on-hold mails in the WooComm
 5. Failed order
 
 == Changelog ==
+= 2.6 =
+* Added the functionality to change the transaction fee
+* Fixed `init_transactional_emails` hook
+
 = 2.5 =
 * Added the functionality to redirect to Stripe instead of choosing the bank on the checkout page
 * Added Moneyou bank
@@ -123,6 +127,9 @@ Biggest update so far, completely redesigned from scratch!
 * First release
 
 == Upgrade Notice ==
+= 2.6 =
+Added the functionality to change the transaction fee and fixed the `init_transactional_emails` hook
+
 = 2.5 =
 Added Moneyou and the functionality to be redirected to Stripe without choosing a bank
 
