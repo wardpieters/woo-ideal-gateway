@@ -26,4 +26,4 @@ If you are looking for more information about this plugin, please visit the [plu
 
 ### Support
 
-If you need any help, open a support thread [over here](https://wordpress.org/support/plugin/woo-ideal-gateway) or email me at [support@wardpieters.nl](mailto:support@wardpieters.nl).
+If you need any help, open a support thread [over here](https://wordpress.org/support/plugin/woo-ideal-gateway).
