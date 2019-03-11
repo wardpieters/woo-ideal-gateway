@@ -215,8 +215,7 @@ function woo_ideal_gateway_init() {
 				'stripe-webhook-key' => array(
 					'title'       => __('Stripe Webhook Key', 'woo-ideal-gateway'),
 					'type'        => 'text',
-					'description' => __('Your webhook URL:', 'woo-ideal-gateway') . ' <strong><a>' . esc_url(home_url('/?stripe_webhook=yes&key=')) . $webhook_key . '</a></strong>' . 
-										'<br>' . __('Read <a href="https://nl.wordpress.org/plugins/woo-ideal-gateway/#installation">here</a> how to setup this webhook', 'woo-ideal-gateway'),
+					'description' => __('Your webhook URL:', 'woo-ideal-gateway') . ' <strong><a>' . esc_url(home_url('/?stripe_webhook=yes&key=')) . $webhook_key . '</a></strong>' . '<br>' . __('Read <a href="https://nl.wordpress.org/plugins/woo-ideal-gateway/#installation">here</a> how to setup this webhook', 'woo-ideal-gateway'),
 					'default'     => $this->random_webhook_key(30),
 					'desc_tip'    => false,
 				),
@@ -245,7 +244,7 @@ function woo_ideal_gateway_init() {
 				
 				'stripe-cost-amount' => array(
 					'title'   => __('Transaction fee', 'woo-ideal-gateway'),
-					'description' => __('The amount of the transaction fee. <strong>Decimal seperator: ', 'woo-ideal-gateway' ) . wc_get_price_decimal_separator() . "</strong>",
+					'description' => __('The amount of the transaction fee.', 'woo-ideal-gateway') . "<br>" . __('Use', 'woo-ideal-gateway') . "  " . wc_get_price_decimal_separator() . "  " . __('as decimal seperator!', 'woo-ideal-gateway'),
 					'type'    => 'text',
 					'default' => '0' . wc_get_price_decimal_separator() . '29'
 				),
