@@ -1,15 +1,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce iDEAL Gateway\n"
-"POT-Creation-Date: 2017-11-29 18:52+0100\n"
-"PO-Revision-Date: 2017-11-29 18:53+0100\n"
+"POT-Creation-Date: 2018-08-21 19:00+0200\n"
+"PO-Revision-Date: 2018-08-21 19:01+0200\n"
 "Last-Translator: Ward Pieters <ward@wardpieters.nl>\n"
 "Language-Team: \n"
 "Language: nl_NL\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.10\n"
+"X-Generator: Poedit 2.0.7\n"
 "X-Poedit-Basepath: ../..\n"
 "X-Poedit-WPHeader: woo-ideal-gateway.php\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -55,24 +55,18 @@ msgid "Order status has been changed to processing"
 msgstr "Bestelling status is veranderd naar verwerken"
 
 #: includes/woo-ideal-gateway-class-stripe-webhook.php:131
-msgid "iDEAL payment failed - Error #0003!"
-msgstr "iDEAL-betaling mislukt - Fout #0003!"
+#: includes/woo-ideal-gateway-class-stripe-webhook.php:145
+#: includes/woo-ideal-gateway-class-stripe-webhook.php:156
+msgid "iDEAL payment failed"
+msgstr "iDEAL-betaling mislukt"
 
 #: includes/woo-ideal-gateway-class-stripe-webhook.php:135
 msgid "Source is not successfully charged"
 msgstr "Source is niet succesvol betaald"
 
-#: includes/woo-ideal-gateway-class-stripe-webhook.php:145
-msgid "iDEAL payment failed - Error #0001!"
-msgstr "iDEAL-betaling mislukt - Fout #0001!"
-
 #: includes/woo-ideal-gateway-class-stripe-webhook.php:149
 msgid "Stripe source and WooCommerce Order Source are not the same!"
 msgstr "Stripe source en WooCommerce bestelling source zijn niet hetzelfde!"
-
-#: includes/woo-ideal-gateway-class-stripe-webhook.php:156
-msgid "iDEAL payment failed - Error: #0002"
-msgstr "iDEAL-betaling mislukt - Fout #0002!"
 
 #: includes/woo-ideal-gateway-class-stripe-webhook.php:161
 msgid "Source is not in a chargeable state"
@@ -87,11 +81,11 @@ msgstr "Source gebruikt niet de iDEAL betaalmethode!"
 msgid "Creating Stripe source failed because no bank was chosen"
 msgstr "Stripe source aanmaken is mislukt omdat er geen bank was gekozen"
 
-#: includes/woo-ideal-gateway-class-stripe.php:191
+#: includes/woo-ideal-gateway-class-stripe.php:189
 msgid "Refund for order"
 msgstr "Terugbetaling voor bestelling"
 
-#: includes/woo-ideal-gateway-class-stripe.php:199
+#: includes/woo-ideal-gateway-class-stripe.php:197
 msgid ""
 "Could not refund because Charge ID required to refund the payment is for "
 "some reason not found"
@@ -99,11 +93,11 @@ msgstr ""
 "Kan niet terugbetalen omdat het 'Charge ID' niet gevonden is voor wat voor "
 "reden dan ook"
 
-#: includes/woo-ideal-gateway-class-stripe.php:248
+#: includes/woo-ideal-gateway-class-stripe.php:246
 msgid "iDEAL Payment refunded"
 msgstr "iDEAL-betaling terugbetaald"
 
-#: includes/woo-ideal-gateway-class-stripe.php:248
+#: includes/woo-ideal-gateway-class-stripe.php:246
 msgid "Refund ID:"
 msgstr "Terugbetalings ID:"
 
@@ -115,7 +109,7 @@ msgstr "Instellingen"
 msgid "Support"
 msgstr "Ondersteuning"
 
-#: woo-ideal-gateway.php:106 woo-ideal-gateway.php:189
+#: woo-ideal-gateway.php:106 woo-ideal-gateway.php:190
 msgid "iDEAL"
 msgstr "iDEAL"
 
@@ -138,74 +132,74 @@ msgstr ""
 "API key</a> te hebben, je kan <a href=\"https://stripe.com/docs/"
 "api#authentication\">hier</a> meer over Stripe's Authenticatie lezen."
 
-#: woo-ideal-gateway.php:132
+#: woo-ideal-gateway.php:133
 msgid "test"
 msgstr "test"
 
-#: woo-ideal-gateway.php:136
+#: woo-ideal-gateway.php:137
 msgid "live"
 msgstr "live"
 
-#: woo-ideal-gateway.php:179
+#: woo-ideal-gateway.php:180
 msgid "Enable/Disable"
 msgstr "Inschakelen/Uitschakelen"
 
-#: woo-ideal-gateway.php:181
+#: woo-ideal-gateway.php:182
 msgid "Enable iDEAL payments"
 msgstr "iDEAL-betalingen inschakelen"
 
-#: woo-ideal-gateway.php:186
+#: woo-ideal-gateway.php:187
 msgid "Title"
 msgstr "Titel"
 
-#: woo-ideal-gateway.php:188
+#: woo-ideal-gateway.php:189
 msgid "Title of this payment gateway a customer sees when checking out"
 msgstr "Titel van deze betalingsmethode die de klant ziet bij het afrekenen"
 
-#: woo-ideal-gateway.php:194
+#: woo-ideal-gateway.php:195
 msgid "Enable/Disable Test Mode"
 msgstr "Inschakelen/Uitschakelen test modus"
 
-#: woo-ideal-gateway.php:196
+#: woo-ideal-gateway.php:197
 msgid ""
 "Enable test mode to see if you have correctly setup Stripe iDEAL payements"
 msgstr ""
 "Schakel test mode in om te kijken of je Stripe iDEAL-betalingen correct hebt "
 "ingesteld"
 
-#: woo-ideal-gateway.php:201
+#: woo-ideal-gateway.php:202
 msgid "Stripe Secret API Key (Live)"
 msgstr "Stripe Secret API Key (Live)"
 
-#: woo-ideal-gateway.php:203
+#: woo-ideal-gateway.php:204
 msgid "Secret API Key from Stripe used for live payments"
 msgstr "Secret API Key van Stripe die wordt gebruikt voor live betalingen"
 
-#: woo-ideal-gateway.php:204
+#: woo-ideal-gateway.php:205
 msgid "sk_live_XXXXXXXXXXXXXXXXXXXXXXXX"
 msgstr "sk_live_XXXXXXXXXXXXXXXXXXXXXXXX"
 
-#: woo-ideal-gateway.php:209
+#: woo-ideal-gateway.php:210
 msgid "Stripe Secret API Key (Test)"
 msgstr "Stripe Secret API Key (Test)"
 
-#: woo-ideal-gateway.php:211
+#: woo-ideal-gateway.php:212
 msgid "Secret API Key from Stripe used for test payments"
 msgstr "Secret API Key van Stripe die wordt gebruikt voor test betalingen"
 
-#: woo-ideal-gateway.php:212
+#: woo-ideal-gateway.php:213
 msgid "sk_test_XXXXXXXXXXXXXXXXXXXXXXXX"
 msgstr "sk_test_XXXXXXXXXXXXXXXXXXXXXXXX"
 
-#: woo-ideal-gateway.php:217
+#: woo-ideal-gateway.php:218
 msgid "Stripe Webhook Key"
 msgstr "Stripe webhook code"
 
-#: woo-ideal-gateway.php:219
+#: woo-ideal-gateway.php:220
 msgid "Your webhook URL:"
 msgstr "Je webhook URL:"
 
-#: woo-ideal-gateway.php:220
+#: woo-ideal-gateway.php:221
 msgid ""
 "Read <a href=\"https://nl.wordpress.org/plugins/woo-ideal-gateway/"
 "#installation\">here</a> how to setup this webhook"
@@ -213,31 +207,39 @@ msgstr ""
 "Lees <a href=\"https://nl.wordpress.org/plugins/woo-ideal-gateway/"
 "#installation\">hier</a> hoe je deze webhook instelt"
 
-#: woo-ideal-gateway.php:226
+#: woo-ideal-gateway.php:227
 msgid "Payment reference"
 msgstr "Betalingsreferentie"
 
-#: woo-ideal-gateway.php:228
+#: woo-ideal-gateway.php:229
 msgid "Payment reference a customer sees in their iDEAL-enviroment"
 msgstr "Betalingsreferentie die de klant ziet in zijn/haar iDEAL-omgeving"
 
-#: woo-ideal-gateway.php:229
+#: woo-ideal-gateway.php:230
 msgid "Payment for #{order_number}"
 msgstr "Betaling voor bestelling #{order_number}"
 
-#: woo-ideal-gateway.php:234
+#: woo-ideal-gateway.php:235
+msgid "Show dropdown with banks"
+msgstr "Keuzelijst met banken"
+
+#: woo-ideal-gateway.php:237
+msgid "Show a dropdown with banks on the checkout page."
+msgstr "Laat een keuzelijst met banken zien op de afrekenpagina."
+
+#: woo-ideal-gateway.php:242
 msgid "Transactionfee"
 msgstr "Transactiekosten"
 
-#: woo-ideal-gateway.php:236
+#: woo-ideal-gateway.php:244
 msgid "Let the customer pay the transactionfee (€ 0,45)"
 msgstr "Bereken de transactiekosten van Stripe door naar de klant (€0,45)"
 
-#: woo-ideal-gateway.php:241
+#: woo-ideal-gateway.php:249
 msgid "Visible error codes"
-msgstr "Zichtbare error codes"
+msgstr "Zichtbare foutcodes"
 
-#: woo-ideal-gateway.php:243
+#: woo-ideal-gateway.php:251
 msgid ""
 "If there is an error while checking out, show the error code to the user. "
 "This might be useful for you to solve an issue a customer has."
@@ -245,39 +247,43 @@ msgstr ""
 "Als er een fout optreedt tijdens het afrekenen, laat de error code aan de "
 "klant zien. Dit kan handig zijn om een probleem op te lossen."
 
-#: woo-ideal-gateway.php:301
+#: woo-ideal-gateway.php:309
 msgid "iDEAL Payment canceled by customer"
 msgstr "iDEAL-betaling geannuleerd door klant"
 
-#: woo-ideal-gateway.php:329
-msgid "Bank"
-msgstr "Bank"
+#: woo-ideal-gateway.php:340
+msgid "iDEAL Bank"
+msgstr "iDEAL Bank"
 
-#: woo-ideal-gateway.php:332
+#: woo-ideal-gateway.php:343
 msgid "Choose your bank"
 msgstr "Kies je bank"
 
-#: woo-ideal-gateway.php:366
+#: woo-ideal-gateway.php:354
+msgid "You will be redirected to iDEAL"
+msgstr "Je wordt doorgestuurd naar iDEAL"
+
+#: woo-ideal-gateway.php:384
 msgid "Please choose your bank and try again"
 msgstr "Kies je bank en probeer het opnieuw"
 
-#: woo-ideal-gateway.php:382 woo-ideal-gateway.php:432
+#: woo-ideal-gateway.php:400 woo-ideal-gateway.php:450
 msgid "Stripe error"
 msgstr "Stripe fout"
 
-#: woo-ideal-gateway.php:383 woo-ideal-gateway.php:384
+#: woo-ideal-gateway.php:401 woo-ideal-gateway.php:402
 msgid "iDEAL payment failed, please try again"
 msgstr "iDEAL-betaling mislukt, probeer het opnieuw"
 
-#: woo-ideal-gateway.php:383
+#: woo-ideal-gateway.php:401
 msgid "Error"
 msgstr "Fout"
 
-#: woo-ideal-gateway.php:392
+#: woo-ideal-gateway.php:410
 msgid "New iDEAL payment initiated by customer"
 msgstr "Nieuwe iDEAL-betaling gestart door klant"
 
-#: woo-ideal-gateway.php:419
+#: woo-ideal-gateway.php:437
 msgid ""
 "A refund through iDEAL is not possible because the order has not been paid "
 "yet. Or the order was initially not using this payment gateway."
@@ -294,12 +300,8 @@ msgid "https://wordpress.org/plugins/woo-ideal-gateway/"
 msgstr "https://wordpress.org/plugins/woo-ideal-gateway/"
 
 #. Description of the plugin/theme
-msgid ""
-"Payment gateway for WooCommerce that allows iDEAL via Stripe. This does not "
-"require a Chamber of commerce number!"
-msgstr ""
-"Betalingsmethode voor WooCommerce die iDEAL betalingen mogelijk maakt. "
-"Hiervoor is geen KvK-nummer vereist!"
+msgid "Payment gateway for WooCommerce that allows iDEAL via Stripe"
+msgstr "Betalingsmethode voor WooCommerce die iDEAL betalingen mogelijk maakt"
 
 #. Author of the plugin/theme
 msgid "Ward Pieters"
@@ -308,6 +310,29 @@ msgstr "Ward Pieters"
 #. Author URI of the plugin/theme
 msgid "https://wardpieters.nl/"
 msgstr "https://wardpieters.nl/"
+
+#~ msgid "iDEAL payment failed - Error #0003!"
+#~ msgstr "iDEAL-betaling mislukt - Fout #0003!"
+
+#~ msgid "iDEAL payment failed - Error #0001!"
+#~ msgstr "iDEAL-betaling mislukt - Fout #0001!"
+
+#~ msgid "iDEAL payment failed - Error: #0002"
+#~ msgstr "iDEAL-betaling mislukt - Fout #0002"
+
+#~ msgid ""
+#~ "Since the release of version 4.0.0 of the official WooCommerce Stripe "
+#~ "Payment Gateway this plugin is deprecated, please use the offical one you "
+#~ "can find <a href=\"https://wordpress.org/plugins/woocommerce-gateway-"
+#~ "stripe/\">here</a>."
+#~ msgstr ""
+#~ "Sinds versie 4.0.0 van de officiële WooCommerce Stripe Payment Gateway is "
+#~ "deze plugin verouderd, u wordt aangeraden de officiële te gebruiken die "
+#~ "<a href=\"https://wordpress.org/plugins/woocommerce-gateway-stripe/"
+#~ "\">hier</a> te vinden is."
+
+#~ msgid "Bank"
+#~ msgstr "Bank"
 
 #~ msgid "Your webhook URL: "
 #~ msgstr "Je webhook URL:"
