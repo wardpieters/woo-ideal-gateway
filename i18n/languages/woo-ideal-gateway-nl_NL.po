@@ -1,15 +1,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce iDEAL Gateway\n"
-"POT-Creation-Date: 2018-08-21 19:00+0200\n"
-"PO-Revision-Date: 2018-08-21 19:01+0200\n"
+"POT-Creation-Date: 2019-03-11 20:41+0100\n"
+"PO-Revision-Date: 2019-03-11 20:43+0100\n"
 "Last-Translator: Ward Pieters <ward@wardpieters.nl>\n"
 "Language-Team: \n"
 "Language: nl_NL\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.0.7\n"
+"X-Generator: Poedit 2.0.6\n"
 "X-Poedit-Basepath: ../..\n"
 "X-Poedit-WPHeader: woo-ideal-gateway.php\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -20,9 +20,10 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
-#: includes/woo-ideal-gateway-class-fee.php:28
-msgid "iDEAL Cost"
-msgstr "iDEAL Kosten"
+#: includes/woo-ideal-gateway-class-fee.php:31 woo-ideal-gateway.php:239
+#: woo-ideal-gateway.php:246
+msgid "Transaction fee"
+msgstr "Transactiekosten"
 
 #: includes/woo-ideal-gateway-class-notification.php:16
 msgid "Notice"
@@ -101,19 +102,19 @@ msgstr "iDEAL-betaling terugbetaald"
 msgid "Refund ID:"
 msgstr "Terugbetalings ID:"
 
-#: woo-ideal-gateway.php:62
+#: woo-ideal-gateway.php:64
 msgid "Settings"
 msgstr "Instellingen"
 
-#: woo-ideal-gateway.php:63
+#: woo-ideal-gateway.php:65
 msgid "Support"
 msgstr "Ondersteuning"
 
-#: woo-ideal-gateway.php:106 woo-ideal-gateway.php:190
+#: woo-ideal-gateway.php:108 woo-ideal-gateway.php:188
 msgid "iDEAL"
 msgstr "iDEAL"
 
-#: woo-ideal-gateway.php:108
+#: woo-ideal-gateway.php:110
 msgid ""
 "WooCommerce iDEAL Gateway will generate a iDEAL source at Stripe using their "
 "API, then send the customer to their bank of choice. At this point the order "
@@ -132,74 +133,74 @@ msgstr ""
 "API key</a> te hebben, je kan <a href=\"https://stripe.com/docs/"
 "api#authentication\">hier</a> meer over Stripe's Authenticatie lezen."
 
-#: woo-ideal-gateway.php:133
+#: woo-ideal-gateway.php:132
 msgid "test"
 msgstr "test"
 
-#: woo-ideal-gateway.php:137
+#: woo-ideal-gateway.php:136
 msgid "live"
 msgstr "live"
 
-#: woo-ideal-gateway.php:180
+#: woo-ideal-gateway.php:178
 msgid "Enable/Disable"
 msgstr "Inschakelen/Uitschakelen"
 
-#: woo-ideal-gateway.php:182
+#: woo-ideal-gateway.php:180
 msgid "Enable iDEAL payments"
-msgstr "iDEAL-betalingen inschakelen"
+msgstr "Schakel iDEAL-betalingen in"
 
-#: woo-ideal-gateway.php:187
+#: woo-ideal-gateway.php:185
 msgid "Title"
 msgstr "Titel"
 
-#: woo-ideal-gateway.php:189
+#: woo-ideal-gateway.php:187
 msgid "Title of this payment gateway a customer sees when checking out"
 msgstr "Titel van deze betalingsmethode die de klant ziet bij het afrekenen"
 
-#: woo-ideal-gateway.php:195
+#: woo-ideal-gateway.php:193
 msgid "Enable/Disable Test Mode"
 msgstr "Inschakelen/Uitschakelen test modus"
 
-#: woo-ideal-gateway.php:197
+#: woo-ideal-gateway.php:195
 msgid ""
 "Enable test mode to see if you have correctly setup Stripe iDEAL payements"
 msgstr ""
 "Schakel test mode in om te kijken of je Stripe iDEAL-betalingen correct hebt "
 "ingesteld"
 
-#: woo-ideal-gateway.php:202
+#: woo-ideal-gateway.php:200
 msgid "Stripe Secret API Key (Live)"
 msgstr "Stripe Secret API Key (Live)"
 
-#: woo-ideal-gateway.php:204
+#: woo-ideal-gateway.php:202
 msgid "Secret API Key from Stripe used for live payments"
 msgstr "Secret API Key van Stripe die wordt gebruikt voor live betalingen"
 
-#: woo-ideal-gateway.php:205
+#: woo-ideal-gateway.php:203
 msgid "sk_live_XXXXXXXXXXXXXXXXXXXXXXXX"
 msgstr "sk_live_XXXXXXXXXXXXXXXXXXXXXXXX"
 
-#: woo-ideal-gateway.php:210
+#: woo-ideal-gateway.php:208
 msgid "Stripe Secret API Key (Test)"
 msgstr "Stripe Secret API Key (Test)"
 
-#: woo-ideal-gateway.php:212
+#: woo-ideal-gateway.php:210
 msgid "Secret API Key from Stripe used for test payments"
 msgstr "Secret API Key van Stripe die wordt gebruikt voor test betalingen"
 
-#: woo-ideal-gateway.php:213
+#: woo-ideal-gateway.php:211
 msgid "sk_test_XXXXXXXXXXXXXXXXXXXXXXXX"
 msgstr "sk_test_XXXXXXXXXXXXXXXXXXXXXXXX"
 
-#: woo-ideal-gateway.php:218
+#: woo-ideal-gateway.php:216
 msgid "Stripe Webhook Key"
 msgstr "Stripe webhook code"
 
-#: woo-ideal-gateway.php:220
+#: woo-ideal-gateway.php:218
 msgid "Your webhook URL:"
 msgstr "Je webhook URL:"
 
-#: woo-ideal-gateway.php:221
+#: woo-ideal-gateway.php:218
 msgid ""
 "Read <a href=\"https://nl.wordpress.org/plugins/woo-ideal-gateway/"
 "#installation\">here</a> how to setup this webhook"
@@ -207,39 +208,47 @@ msgstr ""
 "Lees <a href=\"https://nl.wordpress.org/plugins/woo-ideal-gateway/"
 "#installation\">hier</a> hoe je deze webhook instelt"
 
-#: woo-ideal-gateway.php:227
+#: woo-ideal-gateway.php:224
 msgid "Payment reference"
 msgstr "Betalingsreferentie"
 
-#: woo-ideal-gateway.php:229
+#: woo-ideal-gateway.php:226
 msgid "Payment reference a customer sees in their iDEAL-enviroment"
 msgstr "Betalingsreferentie die de klant ziet in zijn/haar iDEAL-omgeving"
 
-#: woo-ideal-gateway.php:230
+#: woo-ideal-gateway.php:227
 msgid "Payment for #{order_number}"
 msgstr "Betaling voor bestelling #{order_number}"
 
-#: woo-ideal-gateway.php:235
+#: woo-ideal-gateway.php:232
 msgid "Show dropdown with banks"
 msgstr "Keuzelijst met banken"
 
-#: woo-ideal-gateway.php:237
+#: woo-ideal-gateway.php:234
 msgid "Show a dropdown with banks on the checkout page."
 msgstr "Laat een keuzelijst met banken zien op de afrekenpagina."
 
-#: woo-ideal-gateway.php:242
-msgid "Transactionfee"
-msgstr "Transactiekosten"
+#: woo-ideal-gateway.php:241
+msgid "Let the customer pay the transaction fee specified below"
+msgstr "Laat de klant de onderstaande transactiekosten betalen"
 
-#: woo-ideal-gateway.php:244
-msgid "Let the customer pay the transactionfee (€ 0,45)"
-msgstr "Bereken de transactiekosten van Stripe door naar de klant (€0,45)"
+#: woo-ideal-gateway.php:247
+msgid "The amount of the transaction fee."
+msgstr "Het bedrag aan transactiekosten."
 
-#: woo-ideal-gateway.php:249
+#: woo-ideal-gateway.php:247
+msgid "Use"
+msgstr "Gebruik"
+
+#: woo-ideal-gateway.php:247
+msgid "as decimal seperator!"
+msgstr "als decimaalscheidingsteken!"
+
+#: woo-ideal-gateway.php:253
 msgid "Visible error codes"
 msgstr "Zichtbare foutcodes"
 
-#: woo-ideal-gateway.php:251
+#: woo-ideal-gateway.php:255
 msgid ""
 "If there is an error while checking out, show the error code to the user. "
 "This might be useful for you to solve an issue a customer has."
@@ -247,43 +256,43 @@ msgstr ""
 "Als er een fout optreedt tijdens het afrekenen, laat de error code aan de "
 "klant zien. Dit kan handig zijn om een probleem op te lossen."
 
-#: woo-ideal-gateway.php:309
+#: woo-ideal-gateway.php:313
 msgid "iDEAL Payment canceled by customer"
 msgstr "iDEAL-betaling geannuleerd door klant"
 
-#: woo-ideal-gateway.php:340
+#: woo-ideal-gateway.php:344
 msgid "iDEAL Bank"
 msgstr "iDEAL Bank"
 
-#: woo-ideal-gateway.php:343
+#: woo-ideal-gateway.php:347
 msgid "Choose your bank"
 msgstr "Kies je bank"
 
-#: woo-ideal-gateway.php:354
+#: woo-ideal-gateway.php:358
 msgid "You will be redirected to iDEAL"
 msgstr "Je wordt doorgestuurd naar iDEAL"
 
-#: woo-ideal-gateway.php:384
+#: woo-ideal-gateway.php:388
 msgid "Please choose your bank and try again"
 msgstr "Kies je bank en probeer het opnieuw"
 
-#: woo-ideal-gateway.php:400 woo-ideal-gateway.php:450
+#: woo-ideal-gateway.php:404 woo-ideal-gateway.php:454
 msgid "Stripe error"
 msgstr "Stripe fout"
 
-#: woo-ideal-gateway.php:401 woo-ideal-gateway.php:402
+#: woo-ideal-gateway.php:405 woo-ideal-gateway.php:406
 msgid "iDEAL payment failed, please try again"
 msgstr "iDEAL-betaling mislukt, probeer het opnieuw"
 
-#: woo-ideal-gateway.php:401
+#: woo-ideal-gateway.php:405
 msgid "Error"
 msgstr "Fout"
 
-#: woo-ideal-gateway.php:410
+#: woo-ideal-gateway.php:414
 msgid "New iDEAL payment initiated by customer"
 msgstr "Nieuwe iDEAL-betaling gestart door klant"
 
-#: woo-ideal-gateway.php:437
+#: woo-ideal-gateway.php:441
 msgid ""
 "A refund through iDEAL is not possible because the order has not been paid "
 "yet. Or the order was initially not using this payment gateway."
@@ -310,6 +319,9 @@ msgstr "Ward Pieters"
 #. Author URI of the plugin/theme
 msgid "https://wardpieters.nl/"
 msgstr "https://wardpieters.nl/"
+
+#~ msgid "iDEAL Cost"
+#~ msgstr "iDEAL Kosten"
 
 #~ msgid "iDEAL payment failed - Error #0003!"
 #~ msgstr "iDEAL-betaling mislukt - Fout #0003!"

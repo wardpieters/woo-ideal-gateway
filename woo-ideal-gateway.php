@@ -5,7 +5,7 @@
  * Description: Payment gateway for WooCommerce that allows iDEAL via Stripe
  * Author: Ward Pieters
  * Author URI: https://wardpieters.nl/
- * Version: 2.5
+ * Version: 2.6
  * Text Domain: woo-ideal-gateway
  *
  * Copyright: (c) 2018 Ward Pieters
