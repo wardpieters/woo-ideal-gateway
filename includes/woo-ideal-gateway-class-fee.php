@@ -3,7 +3,7 @@
 defined('ABSPATH') or exit;
 
 class Fee extends WC_iDEAL_Gateway {
-	
+
 	/**
 	 * Initialize the iDEAL fee
 	 *
@@ -13,8 +13,8 @@ class Fee extends WC_iDEAL_Gateway {
 		add_action('woocommerce_cart_calculate_fees', array($this, 'woo_ideal_gateway_add_stripe_cost'));
 		add_action('wp_footer', array($this, 'woo_ideal_gateway_cart_update_script'), 9999);
 	}
-	
-	
+
+
 	/**
 	 * Adds the iDEAL fee when enabled
 	 *
@@ -23,16 +23,16 @@ class Fee extends WC_iDEAL_Gateway {
 	function woo_ideal_gateway_add_stripe_cost() {
 		global $woocommerce;
 		if((is_admin() && !defined('DOING_AJAX')) || !is_checkout()) return;
-		
+
 		$cost_amount = $this->get_option('stripe-cost-amount');
 		if(count(explode(wc_get_price_decimal_separator(), $cost_amount)) < 1) return;
-		
+
 		if(WC()->session->chosen_payment_method == "ideal_gateway" && $this->get_option('stripe-cost-to-customer') == 'yes') {
 			$woocommerce->cart->add_fee(__('Transaction fee', 'woo-ideal-gateway'), $cost_amount, true, 'standard');
 		}
 	}
-	
-	
+
+
 	/**
 	 * Updates the cart when switching payment methods
 	 *

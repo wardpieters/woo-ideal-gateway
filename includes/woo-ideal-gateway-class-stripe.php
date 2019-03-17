@@ -82,7 +82,7 @@ class StripeAPI extends WC_iDEAL_Gateway {
 		);
 		
 		if($ideal_bank != "REDIRECT") $stripe_data['ideal']['bank'] = $ideal_bank;
-		
+
 		$response = wp_remote_post($url, array(
 			'method' => 'POST',
 			'timeout' => 45,
@@ -90,8 +90,10 @@ class StripeAPI extends WC_iDEAL_Gateway {
 			'httpversion' => '1.0',
 			'blocking' => true,
 			'headers' => array(
-				"Content-Type" => "application/x-www-form-urlencoded",
-				"Authorization" => "Bearer " . $api_key
+                "User-Agent" => $this->user_agent,
+                "Stripe-Version" => $this->api_version,
+                "Content-Type" => "application/x-www-form-urlencoded",
+				"Authorization" => "Bearer " . $api_key,
 			),
 			'body' => $stripe_data,
 			'cookies' => array()
@@ -151,10 +153,12 @@ class StripeAPI extends WC_iDEAL_Gateway {
 	function GetSourceStatus($source) {
 		$api_key = $this->api_key;
 		$url = $this->api_url . "sources/" . $source;
-		
-		$response = wp_remote_get($url, array(
+
+        $response = wp_remote_get($url, array(
 			'headers' => array(
-				"Authorization" => "Bearer " . $api_key
+                "User-Agent" => $this->user_agent,
+                "Stripe-Version" => $this->api_version,
+                "Authorization" => "Bearer " . $api_key
 			)));
 		if(is_array($response)) {
 			if ($response['response']['code'] != 200) return false;
@@ -194,7 +198,7 @@ class StripeAPI extends WC_iDEAL_Gateway {
 			$data = array(
 				'success' => 'no',
 				'error_type' => 'charge_id_not_found',
-				'error_message' => __('Could not refund because Charge ID required to refund the payment is for some reason not found', 'woo-ideal-gateway')
+				'error_message' => __('Could not refund because Charge ID required to refund the payment is not found', 'woo-ideal-gateway')
 			);
 			return $data;
 		}
@@ -218,6 +222,8 @@ class StripeAPI extends WC_iDEAL_Gateway {
 			'httpversion' => '1.0',
 			'blocking' => true,
 			'headers' => array(
+                "User-Agent" => $this->user_agent,
+                "Stripe-Version" => $this->api_version,
 				"Content-Type" => "application/x-www-form-urlencoded",
 				"Authorization" => "Bearer " . $api_key
 			),
@@ -243,11 +249,9 @@ class StripeAPI extends WC_iDEAL_Gateway {
 			if($response['status'] == "succeeded" OR $response['status'] == "pending") {
 				$refund_id = $response['id'];
 				update_post_meta($order_id, 'woo-ideal-gateway-stripe-refund-id', $refund_id);
-				$order->add_order_note(__('iDEAL Payment refunded', 'woo-ideal-gateway') . '<br>' . __('Refund ID:', 'woo-ideal-gateway') . ' ' . $refund_id);
+				$order->add_order_note(__('iDEAL Payment refunded', 'woo-ideal-gateway'));
 				
-				$data = array(
-					'success' => 'yes'
-				);
+				$data = array('success' => 'yes');
 				return $data;
 			}
 			else {
@@ -266,4 +270,3 @@ class StripeAPI extends WC_iDEAL_Gateway {
 	}
 	
 }
-?>

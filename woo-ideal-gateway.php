@@ -123,9 +123,11 @@ function woo_ideal_gateway_init() {
 			$this->show_checkout_dropdown = $this->get_option('show-checkout-dropdown');
 			$this->title = $this->get_option('title');
 			
-			// Stripe API URL
+			// Stripe API Information
 			$this->api_url = "https://api.stripe.com/v1/";
-			
+			$this->user_agent = "WooCommerce iDEAL Gateway/2.6 (https://wordpress.org/plugins/woo-ideal-gateway/)";
+			$this->api_version = "2018-07-27";
+
 			// API Key variable used in other classes to get current API Key
 			if($this->get_option('test-mode') == 'yes') {
 				$this->api_key = $this->get_option('stripe-api-test');
@@ -141,14 +143,7 @@ function woo_ideal_gateway_init() {
 				add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
 				add_action('woocommerce_thankyou_' . $this->id, array($this, 'woo_ideal_gateway_check_source'));
 			}
-			//add_filter('woocommerce_email_classes', array( $this, 'manipulate_woocommerce_email_sending'));
 		}
-		
-		function manipulate_woocommerce_email_sending($email_class) {
-			//remove_action( 'woocommerce_order_status_pending_to_on-hold_notification', array( $email_class['WC_Email_New_Order'], 'trigger' ) );
-		}
-		
-		
 		
 		/**
 		* Creates a random key used for securing the webhook
