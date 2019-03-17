@@ -12,6 +12,7 @@ Payment gateway for WooCommerce that allows iDEAL via Stripe.
   * ABN Amro
   * ASN Bank
   * Bunq
+  * Moneyou
   * ING
   * Knab
   * Rabobank
