@@ -146,8 +146,129 @@ class StripeWebhook extends WC_iDEAL_Gateway
         }
     }
 
+    function checkWebhook() {
+        $url = $this->api_url . "webhook_endpoints/" . $this->get_option("stripe-webhook-id");
+
+        $response = wp_remote_get($url, array(
+                'method' => 'GET',
+                'timeout' => 45,
+                'redirection' => 5,
+                'httpversion' => '1.0',
+                'blocking' => true,
+                'headers' => array(
+                    "User-Agent" => $this->user_agent,
+                    "Stripe-Version" => $this->api_version,
+                    "Authorization" => "Bearer " . $this->api_key
+                )
+            )
+        );
+
+        if (is_wp_error($response)) return false;
+
+        else {
+            $json_response = json_decode($response["body"], true);
+
+            if ($json_response["status"] == "enabled") return true;
+            else return false;
+        }
+    }
+
+    function addWebhook() {
+        $url = $this->api_url . "webhook_endpoints";
+
+        $response = wp_remote_post($url, array(
+                'method' => 'POST',
+                'timeout' => 45,
+                'redirection' => 5,
+                'httpversion' => '1.0',
+                'blocking' => true,
+                'headers' => array(
+                    "User-Agent" => $this->user_agent,
+                    "Stripe-Version" => $this->api_version,
+                    "Content-Type" => "application/x-www-form-urlencoded",
+                    "Authorization" => "Bearer " . $this->api_key
+                ),
+                'body' => array(
+                    "url" => esc_url(home_url('/?stripe_webhook')),
+                    "enabled_events[]" => "source.chargeable",
+                    "api_version" => $this->api_version
+                )
+            )
+        );
+
+        if (is_wp_error($response)) return false;
+        else {
+            $json_response = json_decode($response["body"], true);
+            if (is_int($json_response["created"])) {
+                $this->update_option("stripe-webhook-id", $json_response["id"]);
+                $this->update_option("stripe-webhook-secret", $json_response["secret"]);
+
+                return true;
+            } else return false;
+        }
+    }
+
+    function getAllWebhooks() {
+        $url = $this->api_url . "webhook_endpoints/list?limit=100";
+
+        $response = wp_remote_get($url, array(
+                'method' => 'GET',
+                'timeout' => 45,
+                'redirection' => 5,
+                'httpversion' => '1.0',
+                'blocking' => true,
+                'headers' => array(
+                    "User-Agent" => $this->user_agent,
+                    "Stripe-Version" => $this->api_version,
+                    "Authorization" => "Bearer " . $this->api_key
+                )
+            )
+        );
+
+        if (is_wp_error($response)) return false;
+
+        else {
+            $json_response = json_decode($response["body"], true);
+
+            if (is_array($json_response["data"])) return $json_response["data"];
+            else return false;
+        }
+    }
+
+    function disableWehook($id) {
+        $url = $this->api_url . "webhook_endpoints/" . $id;
+
+        $response = wp_remote_post($url, array(
+                'method' => 'POST',
+                'timeout' => 45,
+                'redirection' => 5,
+                'httpversion' => '1.0',
+                'blocking' => true,
+                'headers' => array(
+                    "User-Agent" => $this->user_agent,
+                    "Stripe-Version" => $this->api_version,
+                    "Content-Type" => "application/x-www-form-urlencoded",
+                    "Authorization" => "Bearer " . $this->api_key
+                ),
+                'body' => array(
+                    "webhook_endpoint" => $id,
+                    "disabled" => "true"
+                )
+            )
+        );
+
+        if (is_wp_error($response)) return false;
+        else {
+            $json_response = json_decode($response["body"], true);
+            if (!is_null($json_response["id"])) return true;
+            else return false;
+        }
+    }
+
     function checkSignature($StripeSignatureHeader, $RequestBody)
     {
+        // TODO: Fix dit
+
         $valid = true;
         $header = explode(",", $StripeSignatureHeader);
 
@@ -172,8 +293,9 @@ class StripeWebhook extends WC_iDEAL_Gateway
 
     function createSignedPayload($body)
     {
-        $current_timestamp = (string)time();
+        $current_timestamp = (string) time();
         $payload = $current_timestamp . "." . hash("SHA256", $body);
+
         return $payload;
     }
 

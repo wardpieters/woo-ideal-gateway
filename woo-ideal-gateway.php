@@ -92,6 +92,66 @@ function IncludeClasses() {
 add_action('init', 'IncludeClasses', 11);
 add_action('plugins_loaded', 'woo_ideal_gateway_init', 11);
 
+function woo_ideal_webhook_exec() {
+    $StripeWebhook = new StripeWebhook;
+
+    $options = get_option("woocommerce_ideal_gateway_settings", array());
+
+    if($options['stripe-webhook-id'] == "") {
+        $StripeWebhook->addWebhook();
+    } else {
+        if (!$StripeWebhook->checkWebhook()) {
+            $StripeWebhook->addWebhook();
+        }
+    }
+}
+add_action( 'woo_ideal_webhook', 'woo_ideal_webhook_exec' );
+
+if ( ! wp_next_scheduled( 'woo_ideal_webhook' ) ) {
+    wp_schedule_event( time(), 'hourly', 'woo_ideal_webhook' );
+}
+
+function woo_ideal_remove_old_webhooks_exec() {
+    $StripeWebhook = new StripeWebhook;
+
+    $webhooks = $StripeWebhook->getAllWebhooks();
+    if ($webhooks !== false) {
+        foreach ($webhooks as $webhook) {
+            $url = parse_url($webhook["url"]);
+            $wp_url = parse_url(home_url());
+
+            if ($url["host"] == $wp_url["host"]) {
+                $StripeWebhook->disableWebhook($webhook["id"]);
+            }
+        }
+    }
+}
+
+function admin_notice_webhook() {
+    if (isset($_GET["section"]) AND $_GET["section"] == "ideal_gateway" AND isset($_GET['tab']) AND $_GET["tab"] == "checkout") {
+        $StripeWebhook = new StripeWebhook;
+        $webhook_status = $StripeWebhook->checkWebhook();
+
+        if(isset($_GET['fixed']) AND $_GET['fixed'] == "1" AND $webhook_status) {
+            echo "<div class=\"notice notice-success is-dismissible\"><p>Webhook is ingesteld!</p></div>";
+        }
+        elseif (!$webhook_status) {
+            echo "<div class=\"notice notice-error is-dismissible\"><p>Webhook is niet goed ingesteld! Klik <a href=\"" . admin_url("admin.php?page=wc-settings&tab=checkout&section=ideal_gateway&fix_webhook") . "\">hier</a> om dit op te lossen.</p></div>";
+        }
+    }
+}
+add_action( 'admin_notices', 'admin_notice_webhook' );
+
+function setup_webhook_and_redirect() {
+    if (isset($_GET["section"]) AND $_GET["section"] == "ideal_gateway" AND isset($_GET['tab']) AND $_GET["tab"] == "checkout" AND isset($_GET['fix_webhook'])) {
+        $StripeWebhook = new StripeWebhook;
+        $StripeWebhook->addWebhook();
+
+        wp_redirect(admin_url("admin.php?page=wc-settings&tab=checkout&section=ideal_gateway&fixed=1"));
+    }
+}
+add_action( 'admin_init', 'setup_webhook_and_redirect' );
+
 
 function woo_ideal_gateway_init() {
 
@@ -166,7 +226,6 @@ function woo_ideal_gateway_init() {
 		* @since 2.0
 		*/
 		public function init_form_fields() {
-			$webhook_key = $this->webhook_key();
 			$this->form_fields = apply_filters( 'woo__ideal_gateway_form_fields', array(
 
 				'enabled' => array(
@@ -205,14 +264,6 @@ function woo_ideal_gateway_init() {
 					'description' => __('Secret API Key from Stripe used for test payments', 'woo-ideal-gateway' ),
 					'default'     => __('sk_test_XXXXXXXXXXXXXXXXXXXXXXXX', 'woo-ideal-gateway'),
 					'desc_tip'    => true,
-				),
-				
-				'stripe-webhook-key' => array(
-					'title'       => __('Stripe Webhook Key', 'woo-ideal-gateway'),
-					'type'        => 'text',
-					'description' => __('Your webhook URL:', 'woo-ideal-gateway') . ' <strong><a>' . esc_url(home_url('/?stripe_webhook=yes&key=')) . $webhook_key . '</a></strong>' . '<br>' . __('Read <a href="https://nl.wordpress.org/plugins/woo-ideal-gateway/#installation">here</a> how to setup this webhook', 'woo-ideal-gateway'),
-					'default'     => $this->random_webhook_key(30),
-					'desc_tip'    => false,
 				),
 
 				'payment-description' => array(
@@ -261,22 +312,6 @@ function woo_ideal_gateway_init() {
 		*/
 		public function InitStripeAPI() {
 			require_once(__DIR__ . '/includes/woo-ideal-gateway-class-stripe.php');
-		}
-		
-		/**
-		* Checks if a Stripe Webhook Key has been filled in or else returns "PLEASE_CREATE_A_KEY"
-		*
-		* @since 2.0
-		*/
-		public function webhook_key() {
-			if($this->get_option('stripe-webhook-key') != "") {
-				$webhook_key_saved = $this->get_option('stripe-webhook-key');
-				return $webhook_key_saved;
-			}
-			else {
-				$webhook_key = "PLEASE_CREATE_A_KEY";
-				return $webhook_key;
-			}
 		}
 		
 		/**
