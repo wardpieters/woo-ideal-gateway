@@ -209,7 +209,7 @@ class StripeWebhook extends WC_iDEAL_Gateway
     }
 
     function getAllWebhooks() {
-        $url = $this->api_url . "webhook_endpoints/list?limit=100";
+        $url = $this->api_url . "webhook_endpoints?limit=100";
 
         $response = wp_remote_get($url, array(
                 'method' => 'GET',
@@ -235,7 +235,7 @@ class StripeWebhook extends WC_iDEAL_Gateway
         }
     }
 
-    function disableWehook($id) {
+    function disableWebhook($id) {
         $url = $this->api_url . "webhook_endpoints/" . $id;
 
         $response = wp_remote_post($url, array(
@@ -251,7 +251,6 @@ class StripeWebhook extends WC_iDEAL_Gateway
                     "Authorization" => "Bearer " . $this->api_key
                 ),
                 'body' => array(
-                    "webhook_endpoint" => $id,
                     "disabled" => "true"
                 )
             )
