@@ -1,6 +1,6 @@
 # WooCommerce iDEAL Gateway
 
-Payment gateway for WooCommerce that allows iDEAL via Stripe.
+Payment gateway for WooCommerce that allows iDEAL through Stripe.
 
 [![WP compatibility](https://plugintests.com/plugins/woo-ideal-gateway/wp-badge.svg)](https://plugintests.com/plugins/woo-ideal-gateway/latest) [![PHP compatibility](https://plugintests.com/plugins/woo-ideal-gateway/php-badge.svg)](https://plugintests.com/plugins/woo-ideal-gateway/latest)
 
@@ -11,12 +11,13 @@ Payment gateway for WooCommerce that allows iDEAL via Stripe.
 * Supported banks
   * ABN Amro
   * ASN Bank
-  * Bunq
-  * Moneyou
+  * bunq
+  * Handelsbanken
   * ING
-  * Knab
+  * knab
+  * Moneyou
   * Rabobank
-  * Regiobank
+  * RegioBank
   * SNS Bank
   * Triodos Bank
   * Van Lanschot
