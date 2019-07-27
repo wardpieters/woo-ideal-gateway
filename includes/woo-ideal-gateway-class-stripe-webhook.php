@@ -306,11 +306,12 @@ class StripeWebhook extends WC_iDEAL_Gateway
     }
 
     /**
-      * isValidTimeStamp checks whether the inputted timestamp is valid and
-      *        recent (no more than 10 minutes old)
-      *
-      * @param string $RequestTimestamp: Numeric string (no integer) representing a timestamp
-      */
+     * isValidTimeStamp checks whether the inputted timestamp is valid and
+     *        recent (no more than 10 minutes old)
+     *
+     * @param string $RequestTimestamp : Numeric string (no integer) representing a timestamp
+     * @return bool
+     */
     function isValidTimeStamp($RequestTimestamp) {
         if (!is_numeric($RequestTimestamp)) return false;
         elseif ($RequestTimestamp > time() + 60) return false;   //timestamp should be no more than 60 seconds from now
@@ -333,7 +334,7 @@ class StripeWebhook extends WC_iDEAL_Gateway
       */
     function createExpectedSignature($RequestTimestamp, $RequestBody) {
         $signedPayload = $RequestTimestamp . "." . $RequestBody;
-        $signingSecret = get_option("stripe-webhook-secret");
+        $signingSecret = $this->get_option("stripe-webhook-secret");
         $expectedSignature = hash_hmac("sha256", $signedPayload, $signingSecret);
         return $expectedSignature;
     }

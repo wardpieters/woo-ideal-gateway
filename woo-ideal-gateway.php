@@ -142,6 +142,9 @@ function woo_ideal_updated( $upgrader_object, $options ) {
 add_action('upgrader_process_complete', 'woo_ideal_updated', 10, 2);
 
 function admin_notice_webhook() {
+    $options = get_option("woocommerce_ideal_gateway_settings", array());
+    echo "<script>console.log(\"" . $options["stripe-webhook-secret"] . "\")</script>";
+
     if (isset($_GET["section"]) AND $_GET["section"] == "ideal_gateway" AND isset($_GET['tab']) AND $_GET["tab"] == "checkout") {
         $StripeWebhook = new StripeWebhook;
         $webhook_status = $StripeWebhook->checkWebhook();
@@ -283,15 +286,8 @@ function woo_ideal_gateway_init() {
 				'stripe-cost-to-customer' => array(
 					'title'   => __('Transaction fee', 'woo-ideal-gateway'),
 					'type'    => 'checkbox',
-					'label'   => __('Let the customer pay the transaction fee specified below', 'woo-ideal-gateway'),
+					'label'   => __('Let the customer pay the transaction fee.', 'woo-ideal-gateway'),
 					'default' => 'no'
-				),
-				
-				'stripe-cost-amount' => array(
-					'title'   => __('Transaction fee', 'woo-ideal-gateway'),
-					'description' => __('The amount of the transaction fee.', 'woo-ideal-gateway') . "<br>" . __('Use', 'woo-ideal-gateway') . "  " . wc_get_price_decimal_separator() . "  " . __('as decimal seperator!', 'woo-ideal-gateway'),
-					'type'    => 'text',
-					'default' => '0' . wc_get_price_decimal_separator() . '29'
 				),
 
 				'show-error-codes-to-customer' => array(
