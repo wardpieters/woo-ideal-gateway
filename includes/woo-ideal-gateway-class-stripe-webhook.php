@@ -12,40 +12,23 @@ class StripeWebhook extends WC_iDEAL_Gateway
      */
     function ReceiveWebhook()
     {
-        global $woocommerce;
         $url = $this->api_url . "charges";
 
         if (isset($_GET['stripe_webhook'])) {
 
             if (empty($_SERVER['HTTP_STRIPE_SIGNATURE'])) {
-                exit(json_encode(array(
-                    'error' => true,
-                    'message' => __('No Stripe Signature provided', 'woo-ideal-gateway')
-                )));
+                $this->exitWithError(__('No Stripe Signature provided', 'woo-ideal-gateway'));
             }
 
             if (!$this->checkSignature($_SERVER['HTTP_STRIPE_SIGNATURE'], file_get_contents("php://input"))) {
-                exit(json_encode(array(
-                    'error' => true,
-                    'message' => __('Stripe Signature is invalid', 'woo-ideal-gateway')
-                )));
+                $this->exitWithError(__('Stripe Signature is invalid', 'woo-ideal-gateway'));
             }
 
             $input = json_decode(file_get_contents("php://input"), true);
             $data = $input['data']['object'];
 
-            if ((int) $data['metadata']['woo-ideal-gateway'] != true) {
-                exit(json_encode(array(
-                    'error' => true,
-                    'message' => __('1Source is not using the iDEAL payment method!', 'woo-ideal-gateway')
-                )));
-            }
-
-            if ($data['type'] !== "ideal") {
-                exit(json_encode(array(
-                    'error' => true,
-                    'message' => __('2Source is not using the iDEAL payment method!', 'woo-ideal-gateway')
-                )));
+            if (((int) $data['metadata']['woo-ideal-gateway'] != true) OR $data['type'] !== "ideal") {
+                $this->exitWithError(__('Source is not using the iDEAL payment method!', 'woo-ideal-gateway'));
             }
 
             $order_id_meta = (int) $data['metadata']['order_id'];
@@ -55,10 +38,8 @@ class StripeWebhook extends WC_iDEAL_Gateway
                 $order->update_status('failed', __('iDEAL payment failed', 'woo-ideal-gateway') . ' - Error 002'); // order note is optional, if you want to  add a note to order
 
                 // Source is not chargeable
-                exit(json_encode(array(
-                    'error' => true,
-                    'message' => __('Source is not in a chargeable state', 'woo-ideal-gateway')
-                )));
+                $this->exitWithError(__('Source is not in a chargeable state', 'woo-ideal-gateway'));
+
             }
 
             $amount = $order->get_total();
@@ -72,11 +53,7 @@ class StripeWebhook extends WC_iDEAL_Gateway
 
             if ($source !== $source_stripe) {
                 $order->update_status('failed', __('iDEAL payment failed', 'woo-ideal-gateway') . ' - Error 001'); // order note is optional, if you want to  add a note to order
-
-                exit(json_encode(array(
-                    'error' => true,
-                    'message' => __('Stripe source and WooCommerce Order Source are not the same!', 'woo-ideal-gateway')
-                )));
+                $this->exitWithError(__('Stripe source and WooCommerce Order Source are not the same!', 'woo-ideal-gateway'));
             }
 
             $stripe_data = array(
@@ -105,11 +82,7 @@ class StripeWebhook extends WC_iDEAL_Gateway
 
             if (is_wp_error($response)) {
                 $error_message = $response->get_error_message();
-
-                exit(json_encode(array(
-                    'error' => true,
-                    'message' => $error_message
-                )));
+                $this->exitWithError($error_message);
 
             } else {
                 $response = json_decode($response['body'], true);
@@ -144,6 +117,13 @@ class StripeWebhook extends WC_iDEAL_Gateway
                 }
             }
         }
+    }
+
+    function exitWithError($error_message) {
+        exit(json_encode(array(
+            'error' => true,
+            'message' => $error_message
+        )));
     }
 
     function checkWebhook() {
