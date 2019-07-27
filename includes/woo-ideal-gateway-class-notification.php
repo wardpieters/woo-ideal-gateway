@@ -10,7 +10,6 @@ class Notification extends WC_iDEAL_Gateway {
 	 * @since 2.3
 	 */
 	function woo_ideal_gateway_admin_notice_error_api() {
-		$api_key = $this->api_key;
 		$api_key_type = $this->api_key_type;
 		$class = 'notice notice-warning';
 		$message = '<strong>' . __('Notice', 'woo-ideal-gateway') . ':</strong> ' . __('The API Key you are currently using for %api_key_type% payments is the default one. Please change it to a working one found in your Stripe Dashboard.', 'woo-ideal-gateway');

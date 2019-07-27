@@ -36,7 +36,6 @@ class Fee extends WC_iDEAL_Gateway {
 	 * @since 2.0
 	 */
 	function woo_ideal_gateway_cart_update_script() {
-		global $woocommerce;
 		if (is_checkout()) :
 		?>
 			<script>
