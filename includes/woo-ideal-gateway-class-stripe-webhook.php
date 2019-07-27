@@ -265,38 +265,78 @@ class StripeWebhook extends WC_iDEAL_Gateway
         }
     }
 
-    function checkSignature($StripeSignatureHeader, $RequestBody)
-    {
-        // TODO: Fix dit
-
-        $valid = true;
+    /**
+      * checkSignature checks whether there is at least one valid webhook event
+      *        signature that matches the body. There can be multiple for which
+      *        we don't have the key due to key rollover
+      *
+      * @param string $StripeSignatureHeader: "Stripe-Signature"-header as
+      *        received in the HTTP request
+      * @param string $RequestBody: Entire HTTP body
+      *
+      * @return boolean $isValid: whether the signature was valid and matches the body
+      */
+    function checkSignature($StripeSignatureHeader, $RequestBody) {
+        $isValid = false;
         $header = explode(",", $StripeSignatureHeader);
+        $RequestTimestamp = null;
 
         foreach ($header as $item) {
             $item = explode("=", $item);
             if ($item[0] == "t") {
-                if (!$this->isValidTimeStamp($item[1])) $valid = false;
-            } elseif ($item[0] == "v1") {
-                if (!$this->createSignedPayload($RequestBody)) $valid = false;
+                //there can only be one t, so if it's not valid, we know there
+                //is no valid timestamp
+                if (!$this->isValidTimeStamp($item[1])) return false;
+                else $RequestTimestamp = intval($item[1]);
+            }
+        }
+        if ($RequestTimestamp === null) return false; //no valid timestamp
+
+        //need for separate loops as the order is not specified and we need to
+        //check for all v1 headers
+        foreach ($header as $item) {
+            $item = explode("=", $item);
+            if ($item[0] == "v1") {
+                $expectedSignature = $this->createExpectedSignature($RequestTimestamp, $RequestBody);
+                if ($expectedSignature == $item[1]) $isValid = true; //at least one valid v1 header is enough
             }
         }
 
-        return $valid;
+        return $isValid;
     }
 
-    function isValidTimeStamp($timestamp)
-    {
-        return ((string)(int)$timestamp === $timestamp)
-            && ($timestamp <= PHP_INT_MAX)
-            && ($timestamp >= ~PHP_INT_MAX);
+    /**
+      * isValidTimeStamp checks whether the inputted timestamp is valid and
+      *        recent (no more than 10 minutes old)
+      *
+      * @param string $RequestTimestamp: Numeric string (no integer) representing a timestamp
+      */
+    function isValidTimeStamp($RequestTimestamp) {
+        if (!is_numeric($RequestTimestamp)) return false;
+        elseif ($RequestTimestamp > time() + 60) return false;   //timestamp should be no more than 60 seconds from now
+        elseif ($RequestTimestamp < time() - 600) return false;  //timestamp should be no more than 10 minutes ago
+        else return true;
     }
 
-    function createSignedPayload($body)
-    {
-        $current_timestamp = (string) time();
-        $payload = $current_timestamp . "." . hash("SHA256", $body);
-
-        return $payload;
+    /**
+      * createExpectedSignature creates the expected signature for a given body
+      *        at the given timestamp using the stored signing secret
+      * Possible that there are multiple signing secrets active so need to
+      *        check all signatures sent since we only store one key
+      *
+      * @param string $RequestTimestamp: Numeric string (no integer)
+      *        representing a timestamp
+      * @param string $RequestBody: Entire HTTP body
+      *
+      * @return boolean $expectedSignature: Signature expected for the given
+      *        body at the given timestamp using the stored signing secret
+      */
+    function createExpectedSignature($RequestTimestamp, $RequestBody) {
+        $signedPayload = $RequestTimestamp . "." . $RequestBody;
+        $signingSecret = get_option("stripe-webhook-secret");
+        $expectedSignature = hash_hmac("sha256", $signedPayload, $signingSecret);
+        return $expectedSignature;
     }
+
 
 }
