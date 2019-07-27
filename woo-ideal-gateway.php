@@ -127,6 +127,20 @@ function woo_ideal_remove_old_webhooks_exec() {
     }
 }
 
+function woo_ideal_updated( $upgrader_object, $options ) {
+    $current_plugin_path_name = plugin_basename( __FILE__ );
+
+    if ($options['action'] == 'update' && $options['type'] == 'plugin' ){
+        foreach($options['plugins'] as $plugin){
+            if ($plugin == $current_plugin_path_name){
+                woo_ideal_remove_old_webhooks_exec();
+                woo_ideal_webhook_exec();
+            }
+        }
+    }
+}
+add_action('upgrader_process_complete', 'woo_ideal_updated', 10, 2);
+
 function admin_notice_webhook() {
     if (isset($_GET["section"]) AND $_GET["section"] == "ideal_gateway" AND isset($_GET['tab']) AND $_GET["tab"] == "checkout") {
         $StripeWebhook = new StripeWebhook;
@@ -203,21 +217,6 @@ function woo_ideal_gateway_init() {
 				add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
 				add_action('woocommerce_thankyou_' . $this->id, array($this, 'woo_ideal_gateway_check_source'));
 			}
-		}
-		
-		/**
-		* Creates a random key used for securing the webhook
-		*
-		* @since 2.0
-		*/
-		
-		private function random_webhook_key($lengte, $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ') {
-			$str = '';
-			$max = mb_strlen($keyspace, '8bit') - 1;
-			for ($i = 0; $i < $lengte; ++$i) {
-				$str .= $keyspace[random_int(0, $max)];
-			}
-			return $str;
 		}
 
 		/**
@@ -361,6 +360,7 @@ function woo_ideal_gateway_init() {
 					'abn_amro' => 'ABN Amro',
 					'asn_bank' => 'ASN Bank',
 					'bunq' => 'Bunq',
+					'handelsbanken' => 'Handelsbanken',
 					'ing' => 'ING',
 					'knab' => 'Knab',
 					'moneyou' => 'Moneyou',
@@ -371,7 +371,7 @@ function woo_ideal_gateway_init() {
 					'van_lanschot' => 'Van Lanschot'
 				);
 
-				echo '<label>' . __("iDEAL Bank", 'woo-ideal-gateway') . '<span class="required">*</span></label>
+				echo '<label>' . __("Bank", 'woo-ideal-gateway') . '<span class="required">*</span></label>
 				<br>
 				<select id="iDEAL_BANK" name="iDEAL_BANK">
 				<option disabled="disabled" selected>' . __("Choose your bank", 'woo-ideal-gateway') . '</option>';
@@ -412,7 +412,7 @@ function woo_ideal_gateway_init() {
 				* Otherwise return error on checkout page
 				*/
 				
-				$stripe_bank = array('abn_amro', 'asn_bank', 'bunq', 'ing', 'knab', 'moneyou', 'rabobank', 'regiobank', 'sns_bank', 'triodos_bank', 'van_lanschot');
+				$stripe_bank = array('abn_amro', 'asn_bank', 'bunq', 'handelsbanken', 'ing', 'knab', 'moneyou', 'rabobank', 'regiobank', 'sns_bank', 'triodos_bank', 'van_lanschot');
 				
 				if(!isset($_POST['iDEAL_BANK']) && (!in_array($_POST['iDEAL_BANK'],$stripe_bank) OR $_POST['iDEAL_BANK'] != "REDIRECT")) {
 					wc_add_notice(__("Please choose your bank and try again", 'woo-ideal-gateway'), 'error');
