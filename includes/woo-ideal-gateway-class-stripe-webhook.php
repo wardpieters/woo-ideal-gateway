@@ -39,7 +39,6 @@ class StripeWebhook extends WC_iDEAL_Gateway
 
                 // Source is not chargeable
                 $this->exitWithError(__('Source is not in a chargeable state', 'woo-ideal-gateway'));
-
             }
 
             $amount = $order->get_total();
@@ -98,15 +97,14 @@ class StripeWebhook extends WC_iDEAL_Gateway
                     'message' => __("Order status has been changed to processing", 'woo-ideal-gateway'),
                     'error' => false
                 )));
-            } else {
-                $order->update_status('failed', __('iDEAL payment failed', 'woo-ideal-gateway') . ' - Error 003'); // order note is optional, if you want to  add a note to order
-
-                exit(json_encode(array(
-                    'source_id' => $source_stripe,
-                    'message' => __('Source is not successfully charged', 'woo-ideal-gateway'),
-                    'error' => true
-                )));
             }
+
+            $order->update_status('failed', __('iDEAL payment failed', 'woo-ideal-gateway') . ' - Error 003'); // order note is optional, if you want to  add a note to order
+            exit(json_encode(array(
+                'source_id' => $source_stripe,
+                'message' => __('Source is not successfully charged', 'woo-ideal-gateway'),
+                'error' => true
+            )));
         }
     }
 
@@ -187,9 +185,9 @@ class StripeWebhook extends WC_iDEAL_Gateway
         return false;
     }
 
-    function disableWebhook($id)
+    function disableWebhook($webhookId)
     {
-        $url = $this->api_url . "webhook_endpoints/" . $id;
+        $url = $this->api_url . "webhook_endpoints/" . $webhookId;
 
         $headers = array(
             "User-Agent" => $this->user_agent,
@@ -206,7 +204,7 @@ class StripeWebhook extends WC_iDEAL_Gateway
         if ($response === false) return false;
 
         $json_response = json_decode($response["body"], true);
-        if (!is_null($json_response["id"])) return true;
+        if ($json_response["id"] !== null) return true;
 
         return false;
     }
