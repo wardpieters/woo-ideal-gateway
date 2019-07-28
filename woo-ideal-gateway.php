@@ -61,7 +61,7 @@ add_filter('woocommerce_payment_gateways', 'wc_ideal_add_to_gateways');
  */
 function woo_ideal_gateway_plugin_links($links) {
 	$plugin_links = array(
-		'<a href="' . esc_url(admin_url( 'admin.php?page=wc-settings&tab=checkout&section=ideal_gateway' )) . '">' . __( 'Settings', 'woo-ideal-gateway' ) . '</a>',
+		'<a href="' . admin_url( 'admin.php?page=wc-settings&tab=checkout&section=ideal_gateway' ) . '">' . __( 'Settings', 'woo-ideal-gateway' ) . '</a>',
 		'<a href="https://wordpress.org/support/plugin/woo-ideal-gateway/">' . __( 'Support', 'woo-ideal-gateway' ) . '</a>'
 	);
 	return array_merge( $plugin_links, $links );
@@ -97,8 +97,10 @@ function woo_ideal_webhook_exec() {
 
     $options = get_option("woocommerce_ideal_gateway_settings", array());
 
-    if(($options['stripe-webhook-id'] == "") OR (!$StripeWebhook->checkWebhook())) {
-        $StripeWebhook->addWebhook();
+    $webhook_statusses = $StripeWebhook->checkWebhook();
+    if(($options['stripe-webhook-id'] == "")) {
+        if (!$webhook_statusses["live"]) $StripeWebhook->addWebhooks(1);
+        if (!$webhook_statusses["test"]) $StripeWebhook->addWebhooks(2);
     }
 }
 add_action( 'woo_ideal_webhook', 'woo_ideal_webhook_exec' );
@@ -119,18 +121,18 @@ function woo_ideal_remove_old_webhooks_exec() {
 
             // Domain equals domain WordPress is running on and URL contains variables used in a previous version of this plugin.
             if ($url["host"] == $wp_url["host"] AND strpos($url["query"], 'key=') !== false AND strpos($url["query"], 'stripe_webhook=yes') !== false) {
-                $StripeWebhook->disableWebhook($webhook["id"]);
+                $StripeWebhook->disableWebhook($webhook["id"], $webhook["livemode"]);
             }
         }
     }
 }
 
 function woo_ideal_updated( $upgrader_object, $options ) {
-    $current_plugin_path_name = plugin_basename( __FILE__ );
+    $plugin_name = plugin_basename( __FILE__ );
 
     if ($options['action'] == 'update' && $options['type'] == 'plugin' ){
         foreach($options['plugins'] as $plugin){
-            if ($plugin == $current_plugin_path_name){
+            if ($plugin == $plugin_name){
                 woo_ideal_remove_old_webhooks_exec();
                 woo_ideal_webhook_exec();
             }
@@ -140,17 +142,20 @@ function woo_ideal_updated( $upgrader_object, $options ) {
 add_action('upgrader_process_complete', 'woo_ideal_updated', 10, 2);
 
 function admin_notice_webhook() {
-    $options = get_option("woocommerce_ideal_gateway_settings", array());
-
     if (isset($_GET["section"]) AND $_GET["section"] == "ideal_gateway" AND isset($_GET['tab']) AND $_GET["tab"] == "checkout") {
         $StripeWebhook = new StripeWebhook;
-        $webhook_status = $StripeWebhook->checkWebhook();
+        $webhook_status = true;
+        $webhook_statusses = $StripeWebhook->checkWebhook();
+
+        if (!$webhook_statusses["live"] OR !$webhook_statusses["test"]) $webhook_status = false;
+
+        echo "<script>console.log('" . json_encode($webhook_statusses) . "');</script>";
 
         if(isset($_GET['fixed']) AND $_GET['fixed'] == "1" AND $webhook_status) {
             echo "<div class=\"notice notice-success is-dismissible\"><p>Webhook is ingesteld!</p></div>";
         }
         elseif (!$webhook_status) {
-            echo "<div class=\"notice notice-error is-dismissible\"><p>Webhook is niet goed ingesteld! Klik <a href=\"" . esc_url(admin_url("admin.php?page=wc-settings&tab=checkout&section=ideal_gateway&fix_webhook")) . "\">hier</a> om dit op te lossen.</p></div>";
+            echo "<div class=\"notice notice-error is-dismissible\"><p>Webhook is niet goed ingesteld! Klik <a href=\"" . admin_url("admin.php?page=wc-settings&tab=checkout&section=ideal_gateway&fix_webhook") . "\">hier</a> om dit op te lossen.</p></div>";
         }
     }
 }
@@ -160,9 +165,9 @@ function setup_webhook_and_redirect() {
     if (isset($_GET["section"]) AND $_GET["section"] == "ideal_gateway" AND isset($_GET['tab']) AND $_GET["tab"] == "checkout" AND isset($_GET['fix_webhook'])) {
         $StripeWebhook = new StripeWebhook;
         woo_ideal_remove_old_webhooks_exec();
-        $StripeWebhook->addWebhook();
+        $StripeWebhook->addWebhooks(0);
 
-        wp_safe_redirect(esc_url(admin_url("admin.php?page=wc-settings&tab=checkout&section=ideal_gateway&fixed=1")));
+        wp_safe_redirect(admin_url("admin.php?page=wc-settings&tab=checkout&section=ideal_gateway&fixed=1"));
     }
 }
 add_action( 'admin_init', 'setup_webhook_and_redirect' );

@@ -118,25 +118,53 @@ class StripeWebhook extends WC_iDEAL_Gateway
 
     function checkWebhook()
     {
-        $url = $this->api_url . "webhook_endpoints/" . $this->get_option("stripe-webhook-id");
+        $status = array();
 
-        $headers = array(
-            "User-Agent" => $this->user_agent,
-            "Stripe-Version" => $this->api_version,
-            "Authorization" => "Bearer " . $this->api_key
-        );
+        $test_webhook_id = $this->get_option("stripe-test-webhook-id");
+        $live_webhook_id = $this->get_option("stripe-live-webhook-id");
 
-        $response = $this->getRequest($url, $headers);
-        if ($response === false) return false;
+        if (!$this->isBogusAPIKey($this->get_option('stripe-api-live'))) {
+            $url = $this->api_url . "webhook_endpoints/" . $live_webhook_id;
 
-        $json_response = json_decode($response["body"], true);
-        if ($json_response["status"] == "enabled") return true;
+            $headers = array(
+                "User-Agent" => $this->user_agent,
+                "Stripe-Version" => $this->api_version,
+                "Authorization" => "Bearer " . $this->get_option('stripe-api-live')
+            );
 
-        return false;
+            $response = $this->getRequest($url, $headers);
+            $status["live"] = false;
+
+            $json_response = json_decode($response["body"], true);
+            if ($json_response["status"] == "enabled") $status["live"] = true;
+        }
+
+        if (!$this->isBogusAPIKey($this->get_option('stripe-api-test'))) {
+            $url = $this->api_url . "webhook_endpoints/" . $test_webhook_id;
+
+            $headers = array(
+                "User-Agent" => $this->user_agent,
+                "Stripe-Version" => $this->api_version,
+                "Authorization" => "Bearer " . $this->get_option('stripe-api-test')
+            );
+
+            $response = $this->getRequest($url, $headers);
+            $status["test"] = false;
+
+            $json_response = json_decode($response["body"], true);
+            if ($json_response["status"] == "enabled") $status["test"] = true;
+        }
+
+        return $status;
     }
 
-    function addWebhook()
+    // 0 = all
+    // 1 = only live
+    // 2 = only test
+    function addWebhooks($mode)
     {
+        $status = array();
+
         $url = $this->api_url . "webhook_endpoints";
 
         $body = array(
@@ -145,47 +173,84 @@ class StripeWebhook extends WC_iDEAL_Gateway
             "api_version" => $this->api_version
         );
 
-        $headers = array(
-            "User-Agent" => $this->user_agent,
-            "Stripe-Version" => $this->api_version,
-            "Content-Type" => "application/x-www-form-urlencoded",
-            "Authorization" => "Bearer " . $this->api_key
-        );
+        if (($mode == 0 OR $mode == 1) && !$this->isBogusAPIKey($this->get_option('stripe-api-live'))) {
+            $headers = array(
+                "User-Agent" => $this->user_agent,
+                "Stripe-Version" => $this->api_version,
+                "Content-Type" => "application/x-www-form-urlencoded",
+                "Authorization" => "Bearer " . $this->get_option('stripe-api-live')
+            );
 
-        $response = $this->postRequest($url, $body, $headers);
-        if ($response === false) return false;
+            $response = $this->postRequest($url, $body, $headers);
+            $status["live"] = false;
 
-        $json_response = json_decode($response["body"], true);
-        if (is_int($json_response["created"])) {
-            $this->update_option("stripe-webhook-id", $json_response["id"]);
-            $this->update_option("stripe-webhook-secret", $json_response["secret"]);
-            return true;
+            $json_response = json_decode($response["body"], true);
+            if (is_int($json_response["created"])) {
+                $this->update_option("stripe-live-webhook-id", $json_response["id"]);
+                $this->update_option("stripe-live-webhook-secret", $json_response["secret"]);
+                $status["live"] = true;
+            }
         }
 
-        return false;
+        if (($mode == 0 OR $mode == 2) && !$this->isBogusAPIKey($this->get_option('stripe-api-test'))) {
+            $headers = array(
+                "User-Agent" => $this->user_agent,
+                "Stripe-Version" => $this->api_version,
+                "Content-Type" => "application/x-www-form-urlencoded",
+                "Authorization" => "Bearer " . $this->get_option('stripe-api-test')
+            );
+
+            $response = $this->postRequest($url, $body, $headers);
+            $status["test"] = false;
+
+            $json_response = json_decode($response["body"], true);
+            if (is_int($json_response["created"])) {
+                $this->update_option("stripe-test-webhook-id", $json_response["id"]);
+                $this->update_option("stripe-test-webhook-secret", $json_response["secret"]);
+                $status["test"] = true;
+            }
+        }
+
+        return $status;
     }
 
     function getAllWebhooks()
     {
+        $webhooks = array();
         $url = $this->api_url . "webhook_endpoints?limit=100";
 
-        $headers = array(
-            "User-Agent" => $this->user_agent,
-            "Stripe-Version" => $this->api_version,
-            "Authorization" => "Bearer " . $this->api_key
-        );
+        if (!$this->isBogusAPIKey($this->get_option('stripe-api-live'))) {
+            $headers = array(
+                "User-Agent" => $this->user_agent,
+                "Stripe-Version" => $this->api_version,
+                "Authorization" => "Bearer " . $this->get_option('stripe-api-live')
+            );
 
-        $response = $this->getRequest($url, $headers);
-        if ($response === false) return false;
+            $response = $this->getRequest($url, $headers);
+            if ($response !== false) {
+                $json_response = json_decode($response["body"], true);
+                if (is_array($json_response["data"])) $webhooks["live"] = $json_response["data"];
+            }
+        }
 
-        $json_response = json_decode($response["body"], true);
+        if (!$this->isBogusAPIKey($this->get_option('stripe-api-test'))) {
+            $headers = array(
+                "User-Agent" => $this->user_agent,
+                "Stripe-Version" => $this->api_version,
+                "Authorization" => "Bearer " . $this->get_option('stripe-api-test')
+            );
 
-        if (is_array($json_response["data"])) return $json_response["data"];
+            $response = $this->getRequest($url, $headers);
+            if ($response !== false) {
+                $json_response = json_decode($response["body"], true);
+                if (is_array($json_response["data"])) $webhooks["test"] = $json_response["data"];
+            }
+        }
 
-        return false;
+        return $webhooks;
     }
 
-    function disableWebhook($webhookId)
+    function disableWebhook($webhookId, $livemode)
     {
         $url = $this->api_url . "webhook_endpoints/" . $webhookId;
 
@@ -193,8 +258,10 @@ class StripeWebhook extends WC_iDEAL_Gateway
             "User-Agent" => $this->user_agent,
             "Stripe-Version" => $this->api_version,
             "Content-Type" => "application/x-www-form-urlencoded",
-            "Authorization" => "Bearer " . $this->api_key
+            "Authorization" => "Bearer " . $this->get_option('stripe-api-live')
         );
+
+        if (!$livemode) $headers["Authorization"] = "Bearer " . $this->get_option('stripe-api-test');
 
         $body = array(
             "disabled" => "true"
@@ -240,6 +307,11 @@ class StripeWebhook extends WC_iDEAL_Gateway
 
         if (is_wp_error($response)) return false;
         return ($response) ? $response : false;
+    }
+
+    function isBogusAPIKey($key) {
+        if ($key == "sk_live_XXXXXXXXXXXXXXXXXXXXXXXX" || $key == "sk_test_XXXXXXXXXXXXXXXXXXXXXXXX") return true;
+        return false;
     }
 
     /**
