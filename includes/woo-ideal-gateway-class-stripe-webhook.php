@@ -247,16 +247,16 @@ class StripeWebhook extends WC_iDEAL_Gateway
      *        signature that matches the body. There can be multiple for which
      *        we don't have the key due to key rollover
      *
-     * @param string $StripeSignatureHeader : "Stripe-Signature"-header as
+     * @param string $SignatureHeader : "Stripe-Signature"-header as
      *        received in the HTTP request
      * @param string $RequestBody : Entire HTTP body
      *
      * @return boolean $isValid: whether the signature was valid and matches the body
      */
-    function checkSignature($StripeSignatureHeader, $RequestBody)
+    function checkSignature($SignatureHeader, $RequestBody)
     {
         $isValid = false;
-        $header = explode(",", $StripeSignatureHeader);
+        $header = explode(",", $SignatureHeader);
         $RequestTimestamp = null;
 
         foreach ($header as $item) {

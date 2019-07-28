@@ -316,11 +316,7 @@ function woo_ideal_gateway_init() {
 
 			$this->InitStripeAPI();
 			$StripeAPI = new StripeAPI;
-			
-			if($this->show_error_codes_to_customer == 'yes') $show_error = true;
-			else $show_error = false;
-			
-			global $woocommerce;
+
 			$order = new WC_Order($order_id);
 			
 			$order_data = $order->get_data();
@@ -334,8 +330,8 @@ function woo_ideal_gateway_init() {
 			if($status !== false) {
 				if($status == 'failed') {
 					$order->update_status('failed', __('iDEAL Payment canceled by customer', 'woo-ideal-gateway'));
-					header("Location: " . $_SERVER['REQUEST_URI']);
-					return;
+					wp_redirect($_SERVER['REQUEST_URI'], 302, $this->user_agent);
+					exit();
 				}
 			}
 			
