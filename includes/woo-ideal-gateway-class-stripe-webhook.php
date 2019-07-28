@@ -27,11 +27,11 @@ class StripeWebhook extends WC_iDEAL_Gateway
             $input = json_decode(file_get_contents("php://input"), true);
             $data = $input['data']['object'];
 
-            if (((int) $data['metadata']['woo-ideal-gateway'] != true) OR $data['type'] !== "ideal") {
+            if (((int)$data['metadata']['woo-ideal-gateway'] != true) OR $data['type'] !== "ideal") {
                 $this->exitWithError(__('Source is not using the iDEAL payment method!', 'woo-ideal-gateway'));
             }
 
-            $order_id_meta = (int) $data['metadata']['order_id'];
+            $order_id_meta = (int)$data['metadata']['order_id'];
             $order = new WC_Order($order_id_meta);
 
             if ($data['status'] !== "chargeable") {
@@ -56,206 +56,207 @@ class StripeWebhook extends WC_iDEAL_Gateway
                 $this->exitWithError(__('Stripe source and WooCommerce Order Source are not the same!', 'woo-ideal-gateway'));
             }
 
-            $stripe_data = array(
+            $body = array(
                 'amount' => $amount,
                 'currency' => 'eur',
                 'source' => $source_stripe,
                 'description' => $payment_description
             );
 
-            $response = wp_remote_post($url, array(
-                    'method' => 'POST',
-                    'timeout' => 45,
-                    'redirection' => 5,
-                    'httpversion' => '1.0',
-                    'blocking' => true,
-                    'headers' => array(
-                        "User-Agent" => $this->user_agent,
-                        "Stripe-Version" => $this->api_version,
-                        "Content-Type" => "application/x-www-form-urlencoded",
-                        "Authorization" => "Bearer " . $this->api_key
-                    ),
-                    'body' => $stripe_data,
-                    'cookies' => array()
-                )
+            $headers = array(
+                "User-Agent" => $this->user_agent,
+                "Stripe-Version" => $this->api_version,
+                "Content-Type" => "application/x-www-form-urlencoded",
+                "Authorization" => "Bearer " . $this->api_key
             );
 
-            if (is_wp_error($response)) {
+            $response = $this->postRequest($url, $body, $headers);
+
+            if ($response === false) {
                 $error_message = $response->get_error_message();
                 $this->exitWithError($error_message);
+            }
 
+            $response = json_decode($response['body'], true);
+
+            if ($response['paid'] == true) {
+                $charge_id = $response['id'];
+                $source_id = $response['source']['id'];
+                $iban_last_4 = $response['source']['ideal']['iban_last4'];
+                $ideal_bank = strtoupper($response['source']['ideal']['bank']);
+                if ($response['source']['owner']['verified_name'] != null) $verified_name = '<br>' . __('Name:', 'woo-ideal-gateway') . ' ' . $response['source']['owner']['verified_name'];
+                else $verified_name = '';
+
+                //Set order on payment complete
+                update_post_meta($order_id_meta, 'woo-ideal-gateway-stripe-charge-id', $charge_id);
+                $order->add_order_note(__('iDEAL Payment succeeded', 'woo-ideal-gateway') . '<br>' . __('IBAN: x', 'woo-ideal-gateway') . $iban_last_4 . ' (' . $ideal_bank . ')' . $verified_name . '<br>');
+                $order->payment_complete($source_id);
+
+                exit(json_encode(array(
+                    'source_id' => $source_id,
+                    'charge_id' => $charge_id,
+                    'message' => __("Order status has been changed to processing", 'woo-ideal-gateway'),
+                    'error' => false
+                )));
             } else {
-                $response = json_decode($response['body'], true);
+                $order->update_status('failed', __('iDEAL payment failed', 'woo-ideal-gateway') . ' - Error 003'); // order note is optional, if you want to  add a note to order
 
-                if ($response['paid'] == true) {
-                    $charge_id = $response['id'];
-                    $source_id = $response['source']['id'];
-                    $iban_last_4 = $response['source']['ideal']['iban_last4'];
-                    $ideal_bank = strtoupper($response['source']['ideal']['bank']);
-                    if ($response['source']['owner']['verified_name'] != null) $verified_name = '<br>' . __('Name:', 'woo-ideal-gateway') . ' ' . $response['source']['owner']['verified_name'];
-                    else $verified_name = '';
-
-                    //Set order on payment complete
-                    update_post_meta($order_id_meta, 'woo-ideal-gateway-stripe-charge-id', $charge_id);
-                    $order->add_order_note(__('iDEAL Payment succeeded', 'woo-ideal-gateway') . '<br>' . __('IBAN: x', 'woo-ideal-gateway') . $iban_last_4 . ' (' . $ideal_bank . ')' . $verified_name . '<br>');
-                    $order->payment_complete($source_id);
-
-                    exit(json_encode(array(
-                        'source_id' => $source_id,
-                        'charge_id' => $charge_id,
-                        'message' => __("Order status has been changed to processing", 'woo-ideal-gateway'),
-                        'error' => false
-                    )));
-                } else {
-                    $order->update_status('failed', __('iDEAL payment failed', 'woo-ideal-gateway') . ' - Error 003'); // order note is optional, if you want to  add a note to order
-
-                    exit(json_encode(array(
-                        'source_id' => $source_stripe,
-                        'message' => __('Source is not successfully charged', 'woo-ideal-gateway'),
-                        'error' => true
-                    )));
-                }
+                exit(json_encode(array(
+                    'source_id' => $source_stripe,
+                    'message' => __('Source is not successfully charged', 'woo-ideal-gateway'),
+                    'error' => true
+                )));
             }
         }
     }
 
-    function exitWithError($error_message) {
+    function exitWithError($error_message)
+    {
         exit(json_encode(array(
             'error' => true,
             'message' => $error_message
         )));
     }
 
-    function checkWebhook() {
+    function checkWebhook()
+    {
         $url = $this->api_url . "webhook_endpoints/" . $this->get_option("stripe-webhook-id");
 
-        $response = wp_remote_get($url, array(
-                'method' => 'GET',
-                'timeout' => 45,
-                'redirection' => 5,
-                'httpversion' => '1.0',
-                'blocking' => true,
-                'headers' => array(
-                    "User-Agent" => $this->user_agent,
-                    "Stripe-Version" => $this->api_version,
-                    "Authorization" => "Bearer " . $this->api_key
-                )
-            )
+        $headers = array(
+            "User-Agent" => $this->user_agent,
+            "Stripe-Version" => $this->api_version,
+            "Authorization" => "Bearer " . $this->api_key
         );
 
-        if (is_wp_error($response)) return false;
+        $response = $this->getRequest($url, $headers);
+        if ($response === false) return false;
 
-        else {
-            $json_response = json_decode($response["body"], true);
+        $json_response = json_decode($response["body"], true);
+        if ($json_response["status"] == "enabled") return true;
 
-            if ($json_response["status"] == "enabled") return true;
-            else return false;
-        }
+        return false;
     }
 
-    function addWebhook() {
+    function addWebhook()
+    {
         $url = $this->api_url . "webhook_endpoints";
 
+        $body = array(
+            "url" => esc_url(home_url('/?stripe_webhook')),
+            "enabled_events[]" => "source.chargeable",
+            "api_version" => $this->api_version
+        );
+
+        $headers = array(
+            "User-Agent" => $this->user_agent,
+            "Stripe-Version" => $this->api_version,
+            "Content-Type" => "application/x-www-form-urlencoded",
+            "Authorization" => "Bearer " . $this->api_key
+        );
+
+        $response = $this->postRequest($url, $body, $headers);
+        if ($response === false) return false;
+
+        $json_response = json_decode($response["body"], true);
+        if (is_int($json_response["created"])) {
+            $this->update_option("stripe-webhook-id", $json_response["id"]);
+            $this->update_option("stripe-webhook-secret", $json_response["secret"]);
+            return true;
+        }
+
+        return false;
+    }
+
+    function getAllWebhooks()
+    {
+        $url = $this->api_url . "webhook_endpoints?limit=100";
+
+        $headers = array(
+            "User-Agent" => $this->user_agent,
+            "Stripe-Version" => $this->api_version,
+            "Authorization" => "Bearer " . $this->api_key
+        );
+
+        $response = $this->getRequest($url, $headers);
+        if ($response === false) return false;
+
+        $json_response = json_decode($response["body"], true);
+
+        if (is_array($json_response["data"])) return $json_response["data"];
+
+        return false;
+    }
+
+    function disableWebhook($id)
+    {
+        $url = $this->api_url . "webhook_endpoints/" . $id;
+
+        $headers = array(
+            "User-Agent" => $this->user_agent,
+            "Stripe-Version" => $this->api_version,
+            "Content-Type" => "application/x-www-form-urlencoded",
+            "Authorization" => "Bearer " . $this->api_key
+        );
+
+        $body = array(
+            "disabled" => "true"
+        );
+
+        $response = $this->postRequest($url, $body, $headers);
+        if ($response === false) return false;
+
+        $json_response = json_decode($response["body"], true);
+        if (!is_null($json_response["id"])) return true;
+
+        return false;
+    }
+
+    function postRequest($url, $body, $headers)
+    {
         $response = wp_remote_post($url, array(
                 'method' => 'POST',
                 'timeout' => 45,
                 'redirection' => 5,
                 'httpversion' => '1.0',
                 'blocking' => true,
-                'headers' => array(
-                    "User-Agent" => $this->user_agent,
-                    "Stripe-Version" => $this->api_version,
-                    "Content-Type" => "application/x-www-form-urlencoded",
-                    "Authorization" => "Bearer " . $this->api_key
-                ),
-                'body' => array(
-                    "url" => esc_url(home_url('/?stripe_webhook')),
-                    "enabled_events[]" => "source.chargeable",
-                    "api_version" => $this->api_version
-                )
+                'headers' => $headers,
+                'body' => $body
             )
         );
 
         if (is_wp_error($response)) return false;
-        else {
-            $json_response = json_decode($response["body"], true);
-            if (is_int($json_response["created"])) {
-                $this->update_option("stripe-webhook-id", $json_response["id"]);
-                $this->update_option("stripe-webhook-secret", $json_response["secret"]);
-
-                return true;
-            } else return false;
-        }
+        return ($response) ? $response : false;
     }
 
-    function getAllWebhooks() {
-        $url = $this->api_url . "webhook_endpoints?limit=100";
-
+    function getRequest($url, $headers)
+    {
         $response = wp_remote_get($url, array(
                 'method' => 'GET',
                 'timeout' => 45,
                 'redirection' => 5,
                 'httpversion' => '1.0',
                 'blocking' => true,
-                'headers' => array(
-                    "User-Agent" => $this->user_agent,
-                    "Stripe-Version" => $this->api_version,
-                    "Authorization" => "Bearer " . $this->api_key
-                )
+                'headers' => $headers
             )
         );
 
         if (is_wp_error($response)) return false;
-
-        else {
-            $json_response = json_decode($response["body"], true);
-
-            if (is_array($json_response["data"])) return $json_response["data"];
-            else return false;
-        }
-    }
-
-    function disableWebhook($id) {
-        $url = $this->api_url . "webhook_endpoints/" . $id;
-
-        $response = wp_remote_post($url, array(
-                'method' => 'POST',
-                'timeout' => 45,
-                'redirection' => 5,
-                'httpversion' => '1.0',
-                'blocking' => true,
-                'headers' => array(
-                    "User-Agent" => $this->user_agent,
-                    "Stripe-Version" => $this->api_version,
-                    "Content-Type" => "application/x-www-form-urlencoded",
-                    "Authorization" => "Bearer " . $this->api_key
-                ),
-                'body' => array(
-                    "disabled" => "true"
-                )
-            )
-        );
-
-        if (is_wp_error($response)) return false;
-        else {
-            $json_response = json_decode($response["body"], true);
-            if (!is_null($json_response["id"])) return true;
-            else return false;
-        }
+        return ($response) ? $response : false;
     }
 
     /**
-      * checkSignature checks whether there is at least one valid webhook event
-      *        signature that matches the body. There can be multiple for which
-      *        we don't have the key due to key rollover
-      *
-      * @param string $StripeSignatureHeader: "Stripe-Signature"-header as
-      *        received in the HTTP request
-      * @param string $RequestBody: Entire HTTP body
-      *
-      * @return boolean $isValid: whether the signature was valid and matches the body
-      */
-    function checkSignature($StripeSignatureHeader, $RequestBody) {
+     * checkSignature checks whether there is at least one valid webhook event
+     *        signature that matches the body. There can be multiple for which
+     *        we don't have the key due to key rollover
+     *
+     * @param string $StripeSignatureHeader : "Stripe-Signature"-header as
+     *        received in the HTTP request
+     * @param string $RequestBody : Entire HTTP body
+     *
+     * @return boolean $isValid: whether the signature was valid and matches the body
+     */
+    function checkSignature($StripeSignatureHeader, $RequestBody)
+    {
         $isValid = false;
         $header = explode(",", $StripeSignatureHeader);
         $RequestTimestamp = null;
@@ -291,7 +292,8 @@ class StripeWebhook extends WC_iDEAL_Gateway
      * @param string $RequestTimestamp : Numeric string (no integer) representing a timestamp
      * @return bool
      */
-    function isValidTimeStamp($RequestTimestamp) {
+    function isValidTimeStamp($RequestTimestamp)
+    {
         if (!is_numeric($RequestTimestamp)) return false;
         elseif ($RequestTimestamp > time() + 60) return false;   //timestamp should be no more than 60 seconds from now
         elseif ($RequestTimestamp < time() - 600) return false;  //timestamp should be no more than 10 minutes ago
@@ -299,19 +301,20 @@ class StripeWebhook extends WC_iDEAL_Gateway
     }
 
     /**
-      * createExpectedSignature creates the expected signature for a given body
-      *        at the given timestamp using the stored signing secret
-      * Possible that there are multiple signing secrets active so need to
-      *        check all signatures sent since we only store one key
-      *
-      * @param string $RequestTimestamp: Numeric string (no integer)
-      *        representing a timestamp
-      * @param string $RequestBody: Entire HTTP body
-      *
-      * @return boolean $expectedSignature: Signature expected for the given
-      *        body at the given timestamp using the stored signing secret
-      */
-    function createExpectedSignature($RequestTimestamp, $RequestBody) {
+     * createExpectedSignature creates the expected signature for a given body
+     *        at the given timestamp using the stored signing secret
+     * Possible that there are multiple signing secrets active so need to
+     *        check all signatures sent since we only store one key
+     *
+     * @param string $RequestTimestamp : Numeric string (no integer)
+     *        representing a timestamp
+     * @param string $RequestBody : Entire HTTP body
+     *
+     * @return boolean $expectedSignature: Signature expected for the given
+     *        body at the given timestamp using the stored signing secret
+     */
+    function createExpectedSignature($RequestTimestamp, $RequestBody)
+    {
         $signedPayload = $RequestTimestamp . "." . $RequestBody;
         $signingSecret = $this->get_option("stripe-webhook-secret");
         $expectedSignature = hash_hmac("sha256", $signedPayload, $signingSecret);

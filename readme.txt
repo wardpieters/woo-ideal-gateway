@@ -3,7 +3,7 @@ Contributors: WardPieters, WooCommerce
 Tags: ideal, woocommerce, stripe, ideal betalen, payment gateway, ideal gateway, ecommerce, shopping, webshop
 Donate link: https://www.paypal.me/wardpieters
 Requires at least: 4.7
-Tested up to: 5.1
+Tested up to: 5.2.2
 Stable tag: 2.6
 Requires PHP: 5.5
 License: GPLv3
@@ -12,7 +12,7 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Payment gateway for WooCommerce that allows iDEAL via Stripe
 
 == Description ==
-Payment gateway for WooCommerce that allows iDEAL via [Stripe](https://stripe.com/)
+Payment gateway for WooCommerce that allows iDEAL through [Stripe](https://stripe.com/)
 
 = Current features =
 *	iDEAL payments, quick and hassle free
@@ -20,12 +20,13 @@ Payment gateway for WooCommerce that allows iDEAL via [Stripe](https://stripe.co
 *	Supported banks
 	*	ABN Amro
 	*	ASN Bank
-	*	Bunq
-	*	Moneyou
+	*	bunq
+    *   Handelsbanken
 	*	ING
-	*	Knab
+	*	knab
+	*	Moneyou
 	*	Rabobank
-	*	Regiobank
+	*	RegioBank
 	*	SNS Bank
 	*	Triodos Bank
 	*	Van Lanschot
@@ -37,19 +38,10 @@ Payment gateway for WooCommerce that allows iDEAL via [Stripe](https://stripe.co
 The WooCommerce iDEAL Gateway plugin extends WooCommerce with the iDEAL payment method.
 To offer the iDEAL payment method to the vistors of your WordPress website you also require [WooCommerce](https://nl.wordpress.org/plugins/woocommerce/) to be installed.
 
-= Setting up a webhook =
-To correctly setup a [webhook](https://stripe.com/docs/webhooks) you have to go to your [Stripe Dashboard > API > Webhooks](https://dashboard.stripe.com/account/webhooks), make sure you are not in test mode.
-
-Then you click on 'Add Endpoint', in the field 'URL to be called' you fill in the URL stated in the settings of the plugin.
-
-After that you click on 'Select types to send' and mark 'source.chargeable' (to find it very fast, just do CTRL+F). For test mode you are going to de exactly the same, so you could receive payments when in test mode.
-
-If you need help setting this up, please look in the Support section of the FAQ.
-
 == Frequently Asked Questions ==
 
 = Support =
-If you have any problem with this plugin don't hesitate to open a topic over [here](https://wordpress.org/support/plugin/woo-ideal-gateway) or contact me at [support@wardpieters.nl](mailto:support@wardpieters.nl). I will reply as soon as possible.
+If you have any problem with this plugin don't hesitate to open a topic over [here](https://wordpress.org/support/plugin/woo-ideal-gateway). I will reply as soon as possible.
 
 = Why won't the money go directly to my bank account? =
 According to iDEAL's requirements, the money can only go to business accounts. PSPs (Payment Service Providers) who offer C2C (Customer-to-Customer) payments must first hold the money. Stripe is a PSP and holds your money first in a German bank account. Depending on your payout settings, the money will be transferred to you daily/weekly/monthly, but the money you earn today will not be transferred in less than 5 business days.
@@ -76,6 +68,11 @@ If you want to disable this, you can simply disable on-hold mails in the WooComm
 5. Failed order
 
 == Changelog ==
+= 2.7 =
+* Automatic setup of webhooks
+* Stripe API improvements
+* Added Handelsbanken bank
+
 = 2.6 =
 * Added the functionality to change the transaction fee
 * Fixed `init_transactional_emails` hook
@@ -127,6 +124,9 @@ Biggest update so far, completely redesigned from scratch!
 * First release
 
 == Upgrade Notice ==
+= 2.7 =
+Webhooks are now automatically setup using Stripes API. After upgrading please place an order and see if iDEAL payments are working fine.
+
 = 2.6 =
 Added the functionality to change the transaction fee and fixed the `init_transactional_emails` hook
 
